@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed
 from flask_login import current_user
 from wtforms import StringField, PasswordField, SubmitField, \
-    BooleanField, TextAreaField, RadioField
+    BooleanField, TextAreaField, RadioField, IntegerField
 from wtforms.validators import DataRequired, Length, Email, \
     ValidationError, EqualTo
 from main.models import User
@@ -42,3 +43,19 @@ class RegistrationForm(FlaskForm):
             
         if not any(char.islower() for char in password.data): 
             raise ValidationError('Password should have at least one lowercase letter')
+
+class ProductForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+    description = TextAreaField('Description', validators=[DataRequired()])
+    price = IntegerField('Price', validators=[DataRequired()])
+    quantity = IntegerField('Quantity', validators=[DataRequired()])
+    photo = FileField('Photo', validators=[FileAllowed(['jpg', 'png'])])
+    add_product = SubmitField('Add/Update Product')
+
+    def validate_price(self, price):
+        if price.data <= 0:
+            raise ValidationError('Price must be greater than zero.')
+
+    def validate_quantity(self, quantity):
+        if quantity.data < 0:
+            raise ValidationError('Quantity must be greater than zero.')

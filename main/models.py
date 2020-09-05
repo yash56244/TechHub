@@ -23,7 +23,7 @@ class Product(db.Model):
     description = db.Column(db.Text(50), nullable=False)
     price = db.Column(db.Integer, nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
-    photo = db.Column(db.LargeBinary)
+    photo_name = db.Column(db.Text, nullable=False)
     seller_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
 
     def __repr__(self):

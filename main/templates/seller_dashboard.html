@@ -6,6 +6,7 @@
     <p>{{ product.description }}</p>
     <p>{{ product.price }}</p>
     <p>{{ product.quantity }}</p>
-    <img src="{{ url_for('product_photo', id = product.id) }}" width="200" height="200" alt="">
+    <img src="../static/product_pics/{{ product.photo_name }}" alt="">
+    <a href="{{ url_for('update_product', id = product.id) }}" class="btn btn-secondary">Edit</a>
 {% endfor %}
 {% endblock content %}

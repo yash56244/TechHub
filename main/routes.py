@@ -1,16 +1,24 @@
+import os
+import secrets
+from PIL import Image
 from main import app, db, bcrypt
-from flask import redirect, render_template, url_for, flash, request, session
+from flask import redirect, render_template, url_for, flash, request, session, abort
 from flask_login import login_user, logout_user, current_user, login_required
-from main.forms import LoginForm, RegistrationForm
+from main.forms import LoginForm, RegistrationForm, ProductForm
 from main.models import User, Product
+from werkzeug.utils import secure_filename
+
 @app.route('/')
 def home():
     return render_template('home.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    # if current_user.is_authenticated:
-    #     return redirect(url_for('dashboard'))
+    if current_user.is_authenticated:
+        if session['role'] == 'customer':
+            return redirect(url_for('customer_dashboard'))
+        elif session['role'] == 'seller':
+            return redirect(url_for('seller_dashboard'))
     form = LoginForm(request.form)
     if form.validate_on_submit() and request.method == 'POST':
         user = User.query.filter_by(email=form.email.data).first()
@@ -72,21 +80,55 @@ def seller_dashboard():
 @app.route('/dashboard/seller/new', methods=['POST', 'GET'])
 @login_required
 def new_product():
-    if request.method == 'POST':
-        product = Product(name = request.form.get('name'),
-                          description = request.form.get('description'),
-                          price = request.form.get('price'), 
-                          quantity = request.form.get('quantity'), 
-                          photo = request.files['inputPhoto'].read(),
+    form = ProductForm()
+    if form.validate_on_submit():
+        product = Product(name = form.name.data,
+                          description = form.description.data,
+                          price = form.price.data, 
+                          quantity = form.quantity.data,
+                          photo_name = save_picture(form.photo.data),
                           seller = current_user)
         db.session.add(product)
         db.session.commit()
         flash('Product has been added successfully!', 'success')
         return redirect(url_for('seller_dashboard'))
-    return render_template('new_product.html', legend = "Add Product")
+    return render_template('new_product.html', legend = "Add Product", form=form)
 
-@app.route('/product/<int:id>/photo')
+def save_picture(form_picture):
+    random_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + f_ext
+    picture_path = os.path.join(app.root_path, 'static\product_pics', picture_fn)
+
+    output_size = (250, 250)
+    i = Image.open(form_picture)
+    i.thumbnail(output_size)
+    i.save(picture_path)
+
+    return picture_fn
+
+@app.route('/product/<int:id>/update', methods=['GET', 'POST'])
 @login_required
-def product_photo(id):
+def update_product(id):
     product = Product.query.get_or_404(id)
-    return app.response_class(product.photo, mimetype='application/octet-stream')
+    if product.seller != current_user:
+        abort(403)
+    form = ProductForm()
+    if form.validate_on_submit():
+        product.name = form.name.data
+        product.description = form.description.data
+        product.price = form.price.data
+        product.quantity = form.quantity.data
+        pathp = app.root_path + '\static\product_pics\{}'.format(product.photo_name)
+        # if os.path.isfile(pathp):
+        os.remove(pathp)
+        product.photo_name = save_picture(form.photo.data)
+        db.session.commit()
+        flash('Product has been updated!', 'success')
+        return redirect(url_for('seller_dashboard'))
+    elif request.method == 'GET':
+        form.name.data = product.name
+        form.description.data = product.description
+        form.price.data = product.price
+        form.quantity.data = product.quantity
+    return render_template('new_product.html', legend='Update Product', form=form)
