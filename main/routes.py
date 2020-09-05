@@ -1,5 +1,5 @@
 from main import app, db, bcrypt
-from flask import redirect, render_template, url_for, flash, request
+from flask import redirect, render_template, url_for, flash, request, session
 from flask_login import login_user, logout_user, current_user, login_required
 from main.forms import LoginForm, RegistrationForm
 from main.models import User
@@ -16,6 +16,7 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password,
                 form.password.data) and user.role == form.role.data:
+            session['role'] = form.role.data
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
             if next_page:
@@ -47,15 +48,22 @@ def register():
 @app.route('/logout')
 @login_required
 def logout():
+    session.pop('role', None)
     logout_user()
     return redirect(url_for('login'))
 
 @app.route('/dashboard/customer')
 @login_required
 def customer_dashboard():
-    return render_template('customer_dashboard.html')
+    if session['role'] == 'customer':
+        return render_template('customer_dashboard.html')
+    else:
+        return redirect(url_for('seller_dashboard'))
 
 @app.route('/dashboard/seller')
 @login_required
 def seller_dashboard():
-    return render_template('seller_dashboard.html')
+    if session['role'] == 'seller':
+        return render_template('seller_dashboard.html')
+    else:
+        return redirect(url_for('customer_dashboard'))
