@@ -2,7 +2,7 @@ from main import app, db, bcrypt
 from flask import redirect, render_template, url_for, flash, request, session
 from flask_login import login_user, logout_user, current_user, login_required
 from main.forms import LoginForm, RegistrationForm
-from main.models import User
+from main.models import User, Product
 @app.route('/')
 def home():
     return render_template('home.html')
@@ -64,6 +64,29 @@ def customer_dashboard():
 @login_required
 def seller_dashboard():
     if session['role'] == 'seller':
-        return render_template('seller_dashboard.html')
+        products = Product.query.filter_by(seller=current_user).all()
+        return render_template('seller_dashboard.html', products=products)
     else:
         return redirect(url_for('customer_dashboard'))
+
+@app.route('/dashboard/seller/new', methods=['POST', 'GET'])
+@login_required
+def new_product():
+    if request.method == 'POST':
+        product = Product(name = request.form.get('name'),
+                          description = request.form.get('description'),
+                          price = request.form.get('price'), 
+                          quantity = request.form.get('quantity'), 
+                          photo = request.files['inputPhoto'].read(),
+                          seller = current_user)
+        db.session.add(product)
+        db.session.commit()
+        flash('Product has been added successfully!', 'success')
+        return redirect(url_for('seller_dashboard'))
+    return render_template('new_product.html', legend = "Add Product")
+
+@app.route('/product/<int:id>/photo')
+@login_required
+def product_photo(id):
+    product = Product.query.get_or_404(id)
+    return app.response_class(product.photo, mimetype='application/octet-stream')

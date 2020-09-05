@@ -7,16 +7,10 @@
         {% if title %}
         <title>{{ title }}</title>
         {% else %}
-        <title>Feedsgram</title>
+        <title>Tech HUB</title>
         {% endif %}
     </head>
     <style>
-        input[type="text"]::placeholder{
-        color: white;
-        }
-        input[type="text"]:focus{
-        color: white;
-        }
         ::-webkit-scrollbar {
         width: 15px;
         }
@@ -30,11 +24,11 @@
         border-radius: 15px;
         }
     </style>
-    <body style="background-color: #21D4FD;background-image: linear-gradient(19deg, #21D4FD 0%, #B721FF 100%);">
+    <body>
         <header class="header">
-            <nav class="navbar navbar-expand-lg navbar-dark">
+            <nav class="navbar navbar-expand-lg navbar-light">
                 <div class="container">
-                    <a href="#" class="navbar-brand mr-4" style="font-size: xx-large; text-transform: uppercase; font-weight: bold; cursor: default;">Feedsgram</a>
+                    <a href="{{ url_for('home') }}" class="navbar-brand mr-4" style="font-size: xx-large; text-transform: uppercase; font-weight: bold; cursor: default;">Tech HUB</a>
                     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                     </button>

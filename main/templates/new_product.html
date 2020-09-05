@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="content-section container shadow">
+    <form action="" method="POST" name="form" enctype="multipart/form-data">
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">{{ legend }}</legend>
+            <div class="form-group"><b>
+                <label for="" class="form-control-label">Name</label> <br></b>
+                <input type="text" name="name" required class="form-control form-control-md">
+            </div>
+            <div class="form-group"><b>
+                <label for="" class="form-control-label">Description</label><br></b>
+                <input type="text" name="description" required class="form-control form-control-md">
+            </div>
+            <div class="form-group"><b>
+                <label for="" class="form-control-label">Price</label><br></b>
+                <input type="number" name="price" required class="form-control form-control-md">
+            </div>
+            <div class="form-group"><b>
+                <label for="" class="form-control-label">Quantity</label><br></b>
+                <input type="number" name="quantity" required class="form-control form-control-md">
+            </div>
+            <div class="form-group"><b>
+                <label for="inputPhoto" class="form-control-label">Photo</label><br></b>
+                <input type="file" name="inputPhoto" accept="image/x-png,image/gif,image/jpeg" required>
+            </div>
+        </fieldset>
+        <div class="form-group">
+            <input type="submit" class="btn btn-info" value="Add Product">
+            <br><br>
+        </div>
+    </form>
+</div>
+{% endblock content %}
