@@ -4,8 +4,8 @@ from PIL import Image
 from main import app, db, bcrypt
 from flask import redirect, render_template, url_for, flash, request, session, abort
 from flask_login import login_user, logout_user, current_user, login_required
-from main.forms import LoginForm, RegistrationForm, ProductForm, AddToCart
-from main.models import User, Product, Cart
+from main.forms import LoginForm, RegistrationForm, ProductForm, AddToCart, AddressForm
+from main.models import User, Product, Cart, Order, Address
 from werkzeug.utils import secure_filename
 
 @app.route('/')
@@ -74,7 +74,6 @@ def add_to_cart(id):
         if form.quantity.data < product.quantity:
             if not Cart.query.filter_by(user_id=current_user.id).first():
                 cart = Cart(products = [product], user_id = current_user.id)
-                product.quantity -= form.quantity.data
                 if not product.quantity_in_cart:
                     product.quantity_in_cart = form.quantity.data
                 else:
@@ -84,7 +83,6 @@ def add_to_cart(id):
             else:
                 cart = Cart.query.filter_by(user_id = current_user.id).first()
                 cart.products.append(product)
-                product.quantity -= form.quantity.data
                 if not product.quantity_in_cart:
                     product.quantity_in_cart = form.quantity.data
                 else:
@@ -116,7 +114,6 @@ def edit_cart(id, operation):
     if operation == 'increase':
         if product.quantity_in_cart + 1 < product.quantity:
             product.quantity_in_cart += 1
-            product.quantity -= 1
             db.session.commit()
             flash('{} quantity updated'.format(product.name), 'success')
             return redirect(url_for('cart'))
@@ -126,7 +123,6 @@ def edit_cart(id, operation):
     elif operation == 'decrease':
         if product.quantity_in_cart > 1:
             product.quantity_in_cart -= 1
-            product.quantity += 1
             db.session.commit()
             flash('{} quantity updated'.format(product.name), 'success')
             return redirect(url_for('cart'))
@@ -137,7 +133,6 @@ def edit_cart(id, operation):
         cart = Cart.query.filter_by(user_id=current_user.id).first()
         for item in cart.products:
             if(id == item.id):
-                product.quantity += product.quantity_in_cart
                 product.quantity_in_cart = 0
                 cart.products.remove(item)
                 db.session.commit()
@@ -206,3 +201,46 @@ def update_product(id):
         form.price.data = product.price
         form.quantity.data = product.quantity
     return render_template('new_product.html', legend='Update Product', form=form)
+
+@app.route('/order/checkout', methods=['GET', 'POST'])
+@login_required
+def checkout():
+    form = AddressForm()
+    cart = Cart.query.filter_by(user_id=current_user.id).first()
+    total = 0
+    for item in cart.products:
+        total += item.price*item.quantity_in_cart
+    address = Address.query.filter_by(user_id=current_user.id).first()
+    if form.validate_on_submit():
+        address = Address(addressLine1 = form.addressLine1.data,
+                          addressLine2 = form.addressLine2.data,
+                          pincode = form.pincode.data,
+                          city = form.city.data,
+                          state = form.state.data,
+                          mobile = form.mobile.data,
+                          customer = current_user)
+        db.session.add(address)
+        db.session.commit()
+        order = Order(products = cart.products, user_id = current_user.id)
+        db.session.add(order)
+        db.session.commit()
+        for item in cart.products:
+            item.quantity -= item.quantity_in_cart
+            item.quantity_in_cart = 0
+        db.session.commit()
+        flash('Order Place successfully', 'success')
+        return redirect(url_for('orders'))
+    elif request.method == 'GET':
+        form.addressLine1.data = address.addressLine1
+        form.addressLine2.data = address.addressLine2
+        form.pincode.data = address.pincode
+        form.city.data = address.city
+        form.state.data = address.state
+        form.mobile.data = address.mobile
+    return render_template('checkout.html', form=form, total=total)
+
+@app.route('/orders')
+@login_required
+def orders():
+    orders = Order.query.filter_by(user_id=current_user.id).all()
+    return render_template('orders.html', orders=orders)

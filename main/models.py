@@ -13,6 +13,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.Text(15), nullable=False)
     role = db.Column(db.String(10), nullable=False)
     products = db.relationship('Product', backref='seller', lazy=True)
+    addressess = db.relationship('Address', backref='customer', lazy=True)
     cart_items = db.relationship('Product', backref='user', lazy=True)
 
     def __repr__(self):
@@ -25,9 +26,11 @@ class Product(db.Model):
     price = db.Column(db.Integer, nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     quantity_in_cart = db.Column(db.Integer, nullable = True)
+    quantity_placed = db.Column(db.Integer, nullable=True)
     photo_name = db.Column(db.Text, nullable=False)
     seller_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
     cart_id = db.Column(db.Integer, db.ForeignKey('cart.id'), nullable = True)
+    order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable = True)
 
     def __repr__(self):
         return f"Product('{self.name}','{self.seller_id}', '{self.quantity}')"
@@ -36,3 +39,22 @@ class Cart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     products = db.relationship('Product', backref='cartItems', lazy=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+class Order(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    time = db.Column(db.DateTime, nullable = False, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    products = db.relationship('Product', backref='orderedItems', lazy=True)
+
+class Address(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    addressLine1 = db.Column(db.Text(50), nullable=False)
+    addressLine2 = db.Column(db.Text(50), nullable=False)
+    pincode = db.Column(db.Integer, nullable = False)
+    city = db.Column(db.String(15), nullable = False)
+    state = db.Column(db.String(20), nullable = False)
+    mobile = db.Column(db.Integer, nullable = False)
+
+    def __repr__(self):
+        return f"Address('{self.addressLine1}', '{self.addressLine2}', '{self.pincode}', '{self.city}', '{self.state}')"

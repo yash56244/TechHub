@@ -63,3 +63,20 @@ class ProductForm(FlaskForm):
 class AddToCart(FlaskForm):
     quantity = IntegerField('Quantity', validators=[DataRequired()])
     addToCart = SubmitField('Add To Cart')
+
+class AddressForm(FlaskForm):
+    addressLine1 = TextAreaField('Address Line 1', validators=[DataRequired()])
+    addressLine2 = TextAreaField('Address Line 2', validators=[DataRequired()])
+    pincode = IntegerField('Pin-Code', validators=[DataRequired()])
+    city = StringField('City', validators=[DataRequired()])
+    state = StringField('State', validators=[DataRequired()])
+    mobile = IntegerField('Mobile No.', validators=[DataRequired()])
+    submit = SubmitField('Place Order')
+
+    def validate_mobile(self, mobile):
+        if(len(mobile.data)) != 10:
+            raise ValidationError('Mobile Number must contain 10 digits.')
+    
+    def validate_pincode(self, pincode):
+        if(len(pincode.data)) != 10:
+            raise ValidationError('Please enter a valid 6 digit Pin-Code')

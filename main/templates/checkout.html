@@ -1,0 +1,94 @@
+{% extends "layout.html" %}
+{% block content %}
+{% for item in cart.products %}
+<p>{{ item.name }}</p>
+<p>{{ item.price }}</p>
+<p>{{ item.quantity_in_cart }}</p>
+<img src="../static/product_pics/{{ item.photo_name }}" alt="">
+{% endfor %}
+<p>Total - {{ total }}</p>
+<form action="">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.addressLine1.label(class="form-control-label") }}
+        {% if form.addressLine1.errors %}
+        {{ form.addressLine1(class="form-control form-control-lg bg-transparent is-invalid") }}
+        <div class="invalid-feedback">
+            {% for error in form.addressLine1.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+        </div>
+        {% else %}
+        {{ form.addressLine1(class="form-control form-control-lg bg-transparent") }}
+        {% endif %}
+    </div>
+    <div class="form-group">
+        {{ form.addressLine2.label(class="form-control-label") }}
+        {% if form.addressLine2.errors %}
+        {{ form.addressLine2(class="form-control form-control-lg bg-transparent is-invalid") }}
+        <div class="invalid-feedback">
+            {% for error in form.addressLine2.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+        </div>
+        {% else %}
+        {{ form.addressLine2(class="form-control form-control-lg bg-transparent") }}
+        {% endif %}
+    </div>
+    <div class="form-group">
+        {{ form.pincode.label(class="form-control-label") }}
+        {% if form.pincode.errors %}
+        {{ form.pincode(class="form-control form-control-lg bg-transparent is-invalid") }}
+        <div class="invalid-feedback">
+            {% for error in form.pincode.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+        </div>
+        {% else %}
+        {{ form.pincode(class="form-control form-control-lg bg-transparent") }}
+        {% endif %}
+    </div>
+    <div class="form-group">
+        {{ form.city.label(class="form-control-label") }}
+        {% if form.city.errors %}
+        {{ form.city(class="form-control form-control-lg bg-transparent is-invalid") }}
+        <div class="invalid-feedback">
+            {% for error in form.city.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+        </div>
+        {% else %}
+        {{ form.city(class="form-control form-control-lg bg-transparent") }}
+        {% endif %}
+    </div>
+    <div class="form-group">
+        {{ form.state.label(class="form-control-label") }}
+        {% if form.state.errors %}
+        {{ form.state(class="form-control form-control-lg bg-transparent is-invalid") }}
+        <div class="invalid-feedback">
+            {% for error in form.state.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+        </div>
+        {% else %}
+        {{ form.state(class="form-control form-control-lg bg-transparent") }}
+        {% endif %}
+    </div>
+    <div class="form-group">
+        {{ form.mobile.label(class="form-control-label") }}
+        {% if form.mobile.errors %}
+        {{ form.mobile(class="form-control form-control-lg bg-transparent is-invalid") }}
+        <div class="invalid-feedback">
+            {% for error in form.mobile.errors %}
+            <span>{{ error }}</span>
+            {% endfor %}
+        </div>
+        {% else %}
+        {{ form.mobile(class="form-control form-control-lg bg-transparent") }}
+        {% endif %}
+    </div>
+    <div class="form-group">
+        {{ form.submit(class="btn btn-outline-dark") }}
+    </div>
+</form>
+{% endblock content %}

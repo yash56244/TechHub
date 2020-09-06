@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block content %}
+{% for order in orders %}
+    <p>{{ order.id }}</p>
+    <p>{{ order.time }}</p>
+    {% for product in order.products %}
+        <p>{{ product.name }}</p>
+        <p>{{ product.price }}</p>
+        <p>{{ product.quantity_placed }}</p>
+        <img src="../static/product_pics/{{ product.photo_name }}" alt="">
+    {% endfor %}
+{% endfor %}
+{% endblock content %}
