@@ -23,10 +23,16 @@ class Product(db.Model):
     name = db.Column(db.Text(20), nullable=False)
     description = db.Column(db.Text(50), nullable=False)
     price = db.Column(db.Integer, nullable=False)
-    quantity = db.Column(db.Integer, nullable=True)
+    quantity = db.Column(db.Integer, nullable=False)
     quantity_in_cart = db.Column(db.Integer, nullable = True)
     photo_name = db.Column(db.Text, nullable=False)
-    seller_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = True)
+    seller_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
+    cart_id = db.Column(db.Integer, db.ForeignKey('cart.id'), nullable = True)
 
     def __repr__(self):
         return f"Product('{self.name}','{self.seller_id}', '{self.quantity}')"
+
+class Cart(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    products = db.relationship('Product', backref='cartItems', lazy=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))

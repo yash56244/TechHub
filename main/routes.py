@@ -5,7 +5,7 @@ from main import app, db, bcrypt
 from flask import redirect, render_template, url_for, flash, request, session, abort
 from flask_login import login_user, logout_user, current_user, login_required
 from main.forms import LoginForm, RegistrationForm, ProductForm, AddToCart
-from main.models import User, Product
+from main.models import User, Product, Cart
 from werkzeug.utils import secure_filename
 
 @app.route('/')
@@ -14,11 +14,11 @@ def home():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if current_user.is_authenticated:
-        if session['role'] == 'customer':
-            return redirect(url_for('customer_dashboard'))
-        elif session['role'] == 'seller':
-            return redirect(url_for('seller_dashboard'))
+    # if current_user.is_authenticated:
+    #     if session['role'] == 'customer':
+    #         return redirect(url_for('customer_dashboard'))
+    #     elif session['role'] == 'seller':
+    #         return redirect(url_for('seller_dashboard'))
     form = LoginForm(request.form)
     if form.validate_on_submit() and request.method == 'POST':
         user = User.query.filter_by(email=form.email.data).first()
@@ -76,12 +76,25 @@ def add_to_cart(id):
     product = Product.query.filter_by(id=id).first()
     form = AddToCart()
     if form.validate_on_submit():
-        if form.quantity.data <= product.quantity:
-            user = User.query.filter_by(id=current_user.id).first()
-            user.cart_items.append(product)
-            product.quantity -= form.quantity.data
-            product.quantity_in_cart += form.quantity.data
-            db.session.commit()
+        if form.quantity.data < product.quantity:
+            if not Cart.query.filter_by(user_id=current_user.id).first():
+                cart = Cart(products = [product], user_id = current_user.id)
+                product.quantity -= form.quantity.data
+                if not product.quantity_in_cart:
+                    product.quantity_in_cart = form.quantity.data
+                else:
+                    product.quantity_in_cart += form.quantity.data
+                db.session.add(cart)
+                db.session.commit()
+            else:
+                cart = Cart.query.filter_by(user_id = current_user.id).first()
+                cart.products.append(product)
+                product.quantity -= form.quantity.data
+                if not product.quantity_in_cart:
+                    product.quantity_in_cart = form.quantity.data
+                else:
+                    product.quantity_in_cart += form.quantity.data
+                db.session.commit()
             flash('Product successfully added to Cart', 'success')
             return redirect(url_for('cart'))
         else:
@@ -91,8 +104,9 @@ def add_to_cart(id):
 @app.route('/cart')
 @login_required
 def cart():
-    cart = User.query.filter_by(id = current_user.id).first()
-    return render_template('cart.html', cart = cart, title = 'Cart')
+    cart = Cart.query.filter_by(user_id=current_user.id).first()
+    print(cart.products)
+    return render_template('cart.html', cart = cart)
 
 @app.route('/dashboard/seller')
 @login_required

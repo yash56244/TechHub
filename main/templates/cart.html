@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-{% for item in cart.cart_items %}
+{% for item in cart.products %}
 <p>{{ item.name }}</p>
 <p>{{ item.price }}</p>
 <p>{{ item.quantity_in_cart }}</p>
