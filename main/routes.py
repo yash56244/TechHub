@@ -14,11 +14,6 @@ def home():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    # if current_user.is_authenticated:
-    #     if session['role'] == 'customer':
-    #         return redirect(url_for('customer_dashboard'))
-    #     elif session['role'] == 'seller':
-    #         return redirect(url_for('seller_dashboard'))
     form = LoginForm(request.form)
     if form.validate_on_submit() and request.method == 'POST':
         user = User.query.filter_by(email=form.email.data).first()
@@ -104,9 +99,49 @@ def add_to_cart(id):
 @app.route('/cart')
 @login_required
 def cart():
-    cart = Cart.query.filter_by(user_id=current_user.id).first()
-    print(cart.products)
-    return render_template('cart.html', cart = cart)
+    if session['role'] == 'customer':
+        cart = Cart.query.filter_by(user_id=current_user.id).first()
+        total = 0
+        for item in cart.products:
+            total += item.price*item.quantity_in_cart
+        return render_template('cart.html', cart = cart, total = total)
+    else:
+        flash('Only customer can access this page', 'warning')
+        return redirect(url_for('seller_dashboard'))
+
+@app.route('/cart/edit/<string:operation>/<int:id>')
+@login_required
+def edit_cart(id, operation):
+    product = Product.query.filter_by(id=id).first()
+    if operation == 'increase':
+        if product.quantity_in_cart + 1 < product.quantity:
+            product.quantity_in_cart += 1
+            product.quantity -= 1
+            db.session.commit()
+            flash('{} quantity updated'.format(product.name), 'success')
+            return redirect(url_for('cart'))
+        else:
+            flash('Currently {} pieces of this item are available'.format(product.quantity), 'warning')
+            return redirect(url_for('cart'))
+    elif operation == 'decrease':
+        if product.quantity_in_cart > 1:
+            product.quantity_in_cart -= 1
+            product.quantity += 1
+            db.session.commit()
+            flash('{} quantity updated'.format(product.name), 'success')
+            return redirect(url_for('cart'))
+        else:
+            flash('Quantity cannot be less than equal to zero', 'warning')
+            return redirect(url_for('cart'))
+    else:
+        cart = Cart.query.filter_by(user_id=current_user.id).first()
+        for item in cart.products:
+            if(id == item.id):
+                product.quantity += product.quantity_in_cart
+                product.quantity_in_cart = 0
+                cart.products.remove(item)
+                db.session.commit()
+                return redirect(url_for('cart'))
 
 @app.route('/dashboard/seller')
 @login_required

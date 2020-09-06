@@ -3,7 +3,10 @@
 {% for item in cart.products %}
 <p>{{ item.name }}</p>
 <p>{{ item.price }}</p>
-<p>{{ item.quantity_in_cart }}</p>
+<p> <a href="{{ url_for('edit_cart', id=item.id, operation='decrease') }}">-</a> {{ item.quantity_in_cart }} <a href="{{ url_for('edit_cart', id=item.id, operation='increase') }}">+</a></p>
+<img src="../static/product_pics/{{ item.photo_name }}" alt="">
+<a href="{{ url_for('edit_cart', id=item.id, operation='remove') }}">Remove</a>
 {% endfor %}
+<p>Total - {{ total }}</p>
 <a href="#">Check Out!</a>
 {% endblock content %}
