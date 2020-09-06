@@ -49,7 +49,7 @@ class ProductForm(FlaskForm):
     description = TextAreaField('Description', validators=[DataRequired()])
     price = IntegerField('Price', validators=[DataRequired()])
     quantity = IntegerField('Quantity', validators=[DataRequired()])
-    photo = FileField('Photo', validators=[FileAllowed(['jpg', 'png'])])
+    photo = FileField('Photo', validators=[FileAllowed(['jpg', 'png']), DataRequired()])
     add_product = SubmitField('Add/Update Product')
 
     def validate_price(self, price):
@@ -59,3 +59,7 @@ class ProductForm(FlaskForm):
     def validate_quantity(self, quantity):
         if quantity.data < 0:
             raise ValidationError('Quantity must be greater than zero.')
+
+class AddToCart(FlaskForm):
+    quantity = IntegerField('Quantity', validators=[DataRequired()])
+    addToCart = SubmitField('Add To Cart')

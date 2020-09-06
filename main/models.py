@@ -13,6 +13,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.Text(15), nullable=False)
     role = db.Column(db.String(10), nullable=False)
     products = db.relationship('Product', backref='seller', lazy=True)
+    cart_items = db.relationship('Product', backref='user', lazy=True)
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}')"
@@ -22,9 +23,10 @@ class Product(db.Model):
     name = db.Column(db.Text(20), nullable=False)
     description = db.Column(db.Text(50), nullable=False)
     price = db.Column(db.Integer, nullable=False)
-    quantity = db.Column(db.Integer, nullable=False)
+    quantity = db.Column(db.Integer, nullable=True)
+    quantity_in_cart = db.Column(db.Integer, nullable = True)
     photo_name = db.Column(db.Text, nullable=False)
-    seller_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
+    seller_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = True)
 
     def __repr__(self):
-        return f"Product('{name}','{seller_id}', '{quantity}')"
+        return f"Product('{self.name}','{self.seller_id}', '{self.quantity}')"

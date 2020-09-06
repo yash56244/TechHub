@@ -4,7 +4,7 @@ from PIL import Image
 from main import app, db, bcrypt
 from flask import redirect, render_template, url_for, flash, request, session, abort
 from flask_login import login_user, logout_user, current_user, login_required
-from main.forms import LoginForm, RegistrationForm, ProductForm
+from main.forms import LoginForm, RegistrationForm, ProductForm, AddToCart
 from main.models import User, Product
 from werkzeug.utils import secure_filename
 
@@ -49,7 +49,7 @@ def register():
                     password=hashed_pwd, role = form.role.data)
         db.session.add(user)
         db.session.commit()
-        flash('Your account has been created! Please Login', 'success')
+        flash('Your account has been created!', 'success')
         return redirect(url_for('login'))
     return render_template('register.html', form=form, title='Register')
 
@@ -64,9 +64,35 @@ def logout():
 @login_required
 def customer_dashboard():
     if session['role'] == 'customer':
-        return render_template('customer_dashboard.html')
+        products = Product.query.all()
+        form = AddToCart()
+        return render_template('customer_dashboard.html', products = products, form = form)
     else:
         return redirect(url_for('seller_dashboard'))
+
+@app.route('/cart/add/<int:id>', methods = ['GET', 'POST'])
+@login_required
+def add_to_cart(id):
+    product = Product.query.filter_by(id=id).first()
+    form = AddToCart()
+    if form.validate_on_submit():
+        if form.quantity.data <= product.quantity:
+            user = User.query.filter_by(id=current_user.id).first()
+            user.cart_items.append(product)
+            product.quantity -= form.quantity.data
+            product.quantity_in_cart += form.quantity.data
+            db.session.commit()
+            flash('Product successfully added to Cart', 'success')
+            return redirect(url_for('cart'))
+        else:
+            flash('Currently {} pieces of this item are available'.format(product.quantity), 'danger')
+            return redirect(url_for('customer_dashboard'))
+
+@app.route('/cart')
+@login_required
+def cart():
+    cart = User.query.filter_by(id = current_user.id).first()
+    return render_template('cart.html', cart = cart, title = 'Cart')
 
 @app.route('/dashboard/seller')
 @login_required
@@ -120,7 +146,6 @@ def update_product(id):
         product.price = form.price.data
         product.quantity = form.quantity.data
         pathp = app.root_path + '\static\product_pics\{}'.format(product.photo_name)
-        # if os.path.isfile(pathp):
         os.remove(pathp)
         product.photo_name = save_picture(form.photo.data)
         db.session.commit()

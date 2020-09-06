@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block content %}
+{% for item in cart.cart_items %}
+<p>{{ item.name }}</p>
+<p>{{ item.price }}</p>
+<p>{{ item.quantity_in_cart }}</p>
+{% endfor %}
+<a href="#">Check Out!</a>
+{% endblock content %}
