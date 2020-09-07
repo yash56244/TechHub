@@ -1,13 +1,13 @@
 {% extends "layout.html" %}
 {% block content %}
-{% for item in cart.products %}
-<p>{{ item.name }}</p>
-<p>{{ item.price }}</p>
-<p>{{ item.quantity_in_cart }}</p>
-<img src="../static/product_pics/{{ item.photo_name }}" alt="">
+{% for item in cart_items %}
+<p>{{ item.product.name }}</p>
+<p>{{ item.product.price }}</p>
+<p>{{ item.quantity }}</p>
+<img src="../static/product_pics/{{ item.product.photo_name }}" alt="">
 {% endfor %}
 <p>Total - {{ total }}</p>
-<form action="">
+<form action="" method="POST">
     {{ form.hidden_tag() }}
     <div class="form-group">
         {{ form.addressLine1.label(class="form-control-label") }}

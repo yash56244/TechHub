@@ -5,7 +5,7 @@ from main import app, db, bcrypt
 from flask import redirect, render_template, url_for, flash, request, session, abort
 from flask_login import login_user, logout_user, current_user, login_required
 from main.forms import LoginForm, RegistrationForm, ProductForm, AddToCart, AddressForm
-from main.models import User, Product, Cart, Order, Address
+from main.models import User, Product, Cart, Order, Address, Sellerorder
 from werkzeug.utils import secure_filename
 
 @app.route('/')
@@ -72,21 +72,17 @@ def add_to_cart(id):
     form = AddToCart()
     if form.validate_on_submit():
         if form.quantity.data < product.quantity:
-            if not Cart.query.filter_by(user_id=current_user.id).first():
-                cart = Cart(products = [product], user_id = current_user.id)
-                if not product.quantity_in_cart:
-                    product.quantity_in_cart = form.quantity.data
-                else:
-                    product.quantity_in_cart += form.quantity.data
-                db.session.add(cart)
-                db.session.commit()
-            else:
-                cart = Cart.query.filter_by(user_id = current_user.id).first()
-                cart.products.append(product)
-                if not product.quantity_in_cart:
-                    product.quantity_in_cart = form.quantity.data
-                else:
-                    product.quantity_in_cart += form.quantity.data
+            cart = Cart.query.filter_by(user_id=current_user.id).all()
+            alreadyPresent=False
+            for c in cart:
+                if product.id == c.product.id:
+                    c.quantity += form.quantity
+                    db.session.commit()
+                    alreadyPresent=True
+                    break
+            if not alreadyPresent:
+                cart1 = Cart(product = product, user_id=current_user.id, quantity=form.quantity.data)
+                db.session.add(cart1)
                 db.session.commit()
             flash('Product successfully added to Cart', 'success')
             return redirect(url_for('cart'))
@@ -98,45 +94,42 @@ def add_to_cart(id):
 @login_required
 def cart():
     if session['role'] == 'customer':
-        cart = Cart.query.filter_by(user_id=current_user.id).first()
+        cart = Cart.query.filter_by(user_id=current_user.id).all()
         total = 0
-        for item in cart.products:
-            total += item.price*item.quantity_in_cart
+        for item in cart:
+            total += item.product.price*item.quantity
         return render_template('cart.html', cart = cart, total = total)
     else:
         flash('Only customer can access this page', 'warning')
         return redirect(url_for('seller_dashboard'))
 
-@app.route('/cart/edit/<string:operation>/<int:id>')
+@app.route('/cart/edit/<int:id>/<string:operation>')
 @login_required
 def edit_cart(id, operation):
-    product = Product.query.filter_by(id=id).first()
+    cart = Cart.query.filter_by(id=id).first()
     if operation == 'increase':
-        if product.quantity_in_cart + 1 < product.quantity:
-            product.quantity_in_cart += 1
+        if cart.quantity < cart.product.quantity:
+            cart.quantity += 1
             db.session.commit()
-            flash('{} quantity updated'.format(product.name), 'success')
+            flash('{} quantity updated'.format(cart.product.name), 'success')
             return redirect(url_for('cart'))
         else:
-            flash('Currently {} pieces of this item are available'.format(product.quantity), 'warning')
+            flash('Currently {} pieces of this item are available'.format(cart.product.quantity), 'warning')
             return redirect(url_for('cart'))
     elif operation == 'decrease':
-        if product.quantity_in_cart > 1:
-            product.quantity_in_cart -= 1
+        if cart.quantity > 1:
+            cart.quantity -= 1
             db.session.commit()
-            flash('{} quantity updated'.format(product.name), 'success')
+            flash('{} quantity updated'.format(cart.product.name), 'success')
             return redirect(url_for('cart'))
         else:
-            flash('Quantity cannot be less than equal to zero', 'warning')
+            flash('Quantity cannot be less than one.', 'warning')
             return redirect(url_for('cart'))
     else:
-        cart = Cart.query.filter_by(user_id=current_user.id).first()
-        for item in cart.products:
-            if(id == item.id):
-                product.quantity_in_cart = 0
-                cart.products.remove(item)
-                db.session.commit()
-                return redirect(url_for('cart'))
+        db.session.delete(cart)
+        db.session.commit()
+        flash('Item removed successfully', 'success')
+        return redirect(url_for('cart'))
 
 @app.route('/dashboard/seller')
 @login_required
@@ -146,6 +139,17 @@ def seller_dashboard():
         return render_template('seller_dashboard.html', products=products)
     else:
         return redirect(url_for('customer_dashboard'))
+
+@app.route('/dashboard/seller/history')
+@login_required
+def seller_history():
+    seller_orders = Sellerorder.query.filter_by(seller_id = current_user.id).all()
+    customers = []
+    for seller_order in seller_orders:
+        customer_id = seller_order.user_id
+        customer = User.query.filter_by(id=customer_id).first()
+        customers.append(customer)
+    return render_template('seller_history.html',context = zip(seller_orders, customers))
 
 @app.route('/dashboard/seller/new', methods=['POST', 'GET'])
 @login_required
@@ -165,17 +169,18 @@ def new_product():
     return render_template('new_product.html', legend = "Add Product", form=form)
 
 def save_picture(form_picture):
-    random_hex = secrets.token_hex(8)
-    _, f_ext = os.path.splitext(form_picture.filename)
-    picture_fn = random_hex + f_ext
-    picture_path = os.path.join(app.root_path, 'static\product_pics', picture_fn)
+    if form_picture:
+        random_hex = secrets.token_hex(8)
+        _, f_ext = os.path.splitext(form_picture.filename)
+        picture_fn = random_hex + f_ext
+        picture_path = os.path.join(app.root_path, 'static\product_pics', picture_fn)
 
-    output_size = (250, 250)
-    i = Image.open(form_picture)
-    i.thumbnail(output_size)
-    i.save(picture_path)
+        output_size = (250, 250)
+        i = Image.open(form_picture)
+        i.thumbnail(output_size)
+        i.save(picture_path)
 
-    return picture_fn
+        return picture_fn
 
 @app.route('/product/<int:id>/update', methods=['GET', 'POST'])
 @login_required
@@ -206,11 +211,10 @@ def update_product(id):
 @login_required
 def checkout():
     form = AddressForm()
-    cart = Cart.query.filter_by(user_id=current_user.id).first()
+    cart = Cart.query.filter_by(user_id=current_user.id).all()
     total = 0
-    for item in cart.products:
-        total += item.price*item.quantity_in_cart
-    address = Address.query.filter_by(user_id=current_user.id).first()
+    for item in cart:
+        total += item.product.price*item.quantity
     if form.validate_on_submit():
         address = Address(addressLine1 = form.addressLine1.data,
                           addressLine2 = form.addressLine2.data,
@@ -221,23 +225,32 @@ def checkout():
                           customer = current_user)
         db.session.add(address)
         db.session.commit()
-        order = Order(products = cart.products, user_id = current_user.id)
-        db.session.add(order)
-        db.session.commit()
-        for item in cart.products:
-            item.quantity -= item.quantity_in_cart
-            item.quantity_in_cart = 0
-        db.session.commit()
+        for item in cart:
+            order = Order(product = item.product, user_id = current_user.id, quantity=item.quantity, total = total)
+            db.session.add(order)
+            db.session.commit()
+        for item in cart:
+            sellerOrder = Sellerorder(seller_id=item.product.seller_id, user_id = current_user.id, product = item.product, quantity=item.quantity, total = total)
+            db.session.add(sellerOrder)
+            db.session.commit()
+        for item in cart:
+            product = Product.query.filter_by(id=item.product.id).first()
+            product.quantity -= item.quantity
+            db.session.commit()
+        for item in cart:
+            Cart.query.filter_by(id=item.id).delete()
+            db.session.commit()
         flash('Order Place successfully', 'success')
         return redirect(url_for('orders'))
-    elif request.method == 'GET':
+    address = Address.query.filter_by(user_id=current_user.id).first()
+    if request.method == 'GET' and address is not None:
         form.addressLine1.data = address.addressLine1
         form.addressLine2.data = address.addressLine2
         form.pincode.data = address.pincode
         form.city.data = address.city
         form.state.data = address.state
         form.mobile.data = address.mobile
-    return render_template('checkout.html', form=form, total=total)
+    return render_template('checkout.html', form=form, total=total, cart_items=cart)
 
 @app.route('/orders')
 @login_required

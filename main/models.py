@@ -14,7 +14,6 @@ class User(db.Model, UserMixin):
     role = db.Column(db.String(10), nullable=False)
     products = db.relationship('Product', backref='seller', lazy=True)
     addressess = db.relationship('Address', backref='customer', lazy=True)
-    cart_items = db.relationship('Product', backref='user', lazy=True)
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}')"
@@ -24,27 +23,37 @@ class Product(db.Model):
     name = db.Column(db.Text(20), nullable=False)
     description = db.Column(db.Text(50), nullable=False)
     price = db.Column(db.Integer, nullable=False)
-    quantity = db.Column(db.Integer, nullable=False)
-    quantity_in_cart = db.Column(db.Integer, nullable = True)
-    quantity_placed = db.Column(db.Integer, nullable=True)
+    quantity = db.Column(db.Integer, nullable=True)
     photo_name = db.Column(db.Text, nullable=False)
     seller_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
-    cart_id = db.Column(db.Integer, db.ForeignKey('cart.id'), nullable = True)
-    order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable = True)
+    cart_id = db.Column(db.Integer, db.ForeignKey('cart.id'))
+    order_id = db.Column(db.Integer, db.ForeignKey('order.id'))
+    seller_order_id = db.Column(db.Integer, db.ForeignKey('sellerorder.id'))
 
     def __repr__(self):
         return f"Product('{self.name}','{self.seller_id}', '{self.quantity}')"
 
 class Cart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    products = db.relationship('Product', backref='cartItems', lazy=True)
+    product = db.relationship('Product', backref='productc', uselist=False)
+    quantity = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     time = db.Column(db.DateTime, nullable = False, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    products = db.relationship('Product', backref='orderedItems', lazy=True)
+    product = db.relationship('Product', backref='producto', uselist=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    total = db.Column(db.Integer, nullable=False)
+
+class Sellerorder(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    seller_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    product = db.relationship('Product', backref='productso', uselist=False)
+    quantity = db.Column(db.Integer, nullable=False)
+    total = db.Column(db.Integer, nullable=False)
 
 class Address(db.Model):
     id = db.Column(db.Integer, primary_key=True)

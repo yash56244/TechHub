@@ -1,8 +1,10 @@
 {% extends "layout.html" %}
 {% block content %}
-{% for order in orders %}
+{% for (order, customer) in context %}
     <p>{{ order.id }}</p>
     <p>{{ order.time }}</p>
+    <p>{{ customer.username }}</p>
+    <p>{{ customer.email }}</p>
     <p>{{ order.product.name }}</p>
     <p>{{ order.product.price }}</p>
     <p>{{ order.quantity }}</p>

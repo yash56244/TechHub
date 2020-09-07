@@ -49,7 +49,7 @@ class ProductForm(FlaskForm):
     description = TextAreaField('Description', validators=[DataRequired()])
     price = IntegerField('Price', validators=[DataRequired()])
     quantity = IntegerField('Quantity', validators=[DataRequired()])
-    photo = FileField('Photo', validators=[FileAllowed(['jpg', 'png']), DataRequired()])
+    photo = FileField('Photo', validators=[FileAllowed(['jpg', 'png'])])
     add_product = SubmitField('Add/Update Product')
 
     def validate_price(self, price):
@@ -74,9 +74,9 @@ class AddressForm(FlaskForm):
     submit = SubmitField('Place Order')
 
     def validate_mobile(self, mobile):
-        if(len(mobile.data)) != 10:
+        if(len(str(mobile.data))) != 10:
             raise ValidationError('Mobile Number must contain 10 digits.')
     
     def validate_pincode(self, pincode):
-        if(len(pincode.data)) != 10:
+        if(len(str(pincode.data))) != 6:
             raise ValidationError('Please enter a valid 6 digit Pin-Code')
