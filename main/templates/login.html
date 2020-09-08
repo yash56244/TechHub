@@ -1,51 +1,63 @@
 {% extends "layout.html" %}
 {% block content %}
-        <form method="POST" action="">
+<div class="container z-depth-3" style="padding-bottom: 10px;">
+        <form method="POST" action="" class="col s12 container">
             {{ form.hidden_tag() }}
-            <fieldset class="form-group">
                 <center>
-                    <legend style="font-size: 40px; font-family: cursive; font-weight: 400;">Log In</legend>
+                    <h1>Log In</h1>
                 </center>
-                <div class="form-group">
-                    {{ form.email.label(class="form-control-label") }}
+                <div class="row">
+                    <div class="input-field col s12">
                     {% if form.email.errors %}
-                    {{ form.email(class="form-control form-control-lg bg-transparent is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.email.errors %}
-                        <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
+                    <i class="material-icons prefix">email</i>
+                    {{ form.email(class="validate") }}
+                    {% for error in form.email.errors %}
+                    <span class="helper-text red-text" data-error="{{error}}" data-success="right">{{error}}</span>
+                    {% endfor %}
                     {% else %}
-                    {{ form.email(class="form-control form-control-lg bg-transparent") }}
+                    <i class="material-icons prefix">email</i>
+                    {{ form.email(class="validate") }}
                     {% endif %}
+                    {{ form.email.label }}
+                    </div>
                 </div>
-                <div>
-                    {{ form.role }}
+                <div class="row">
+                    <div class="input-field col s12">
+                    {% if form.role.errors %}
+                    <i class="material-icons prefix">supervisor_account</i>
+                    {{ form.role(class="autocomplete") }}
+                    <span class="helper-text" data-success="right">customer, seller</span>
+                    {% for error in form.role.errors %}
+                    <span class="helper-text red-text" data-error="{{error}}" data-success="right">{{error}}</span>
+                    {% endfor %}
+                    {% else %}
+                    <i class="material-icons prefix">supervisor_account</i>
+                    {{ form.role(class="autocomplete") }}
+                    <span class="helper-text" data-success="right">customer, seller</span>
+                    {% endif %}
+                    {{ form.role.label }}
+                    </div>
                 </div>
-                <div class="form-group">
-                    {{ form.password.label(class="form-control-label") }}
+                <div class="row">
+                    <div class="input-field col s12">
                     {% if form.password.errors %}
-                    {{ form.password(class="form-control form-control-lg bg-transparent is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.password.errors %}
-                        <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
+                    <i class="material-icons prefix">vpn_key</i>
+                    {{ form.password(class="validate") }}
+                    {% for error in form.password.errors %}
+                    <span class="helper-text red-text" data-error="{{error}}" data-success="right">{{error}}</span>
+                    {% endfor %}
                     {% else %}
-                    {{ form.password(class="form-control form-control-lg bg-transparent") }}
+                    <i class="material-icons prefix">vpn_key</i>
+                    {{ form.password(class="validate") }}
                     {% endif %}
+                    {{ form.password.label }}
+                    </div>
                 </div>
-                <div class="form-check">
-                    {{ form.remember(class="form-check-input") }}
-                    {{ form.remember.label(class="form-check-label") }}
-                </div>
-            </fieldset>
-            <div class="form-group">
-                {{ form.submit(class="btn btn-outline-dark") }}
-            </div>
-            <hr style="background-color: white;">
-            <small>
-            Need An Account? <a class="btn btn-outline-dark" href="{{ url_for('register') }}">Sign Up Now</a>
-            </small>
+                {{ form.submit(class="btn waves-light deep-orange") }}
+            <hr>
+            <p>
+            Need An Account? <a class="waves-effect waves-light btn deep-orange" href="{{ url_for('register') }}">Sign Up Now</a>
+            </p>
         </form>
+</div>
 {% endblock content %}

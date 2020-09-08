@@ -14,7 +14,7 @@
     </head>
     <body>
         <nav>
-            <div class="nav-wrapper cyan">
+            <div class="nav-wrapper cyan accent-2" id="nav">
                 <div class="container">
                     <a href="{{ url_for('home') }}" class="brand-logo">Tech HUB</a>
                     <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
@@ -75,6 +75,17 @@
         <script>
             $(document).ready(function(){
                 $('.sidenav').sidenav();
+            });
+            $(document).ready(function() {
+                $('input#input_text, textarea#textarea2').characterCounter();
+            });
+            $(document).ready(function(){
+                $('input.autocomplete').autocomplete({
+                data: {
+                    "customer": null,
+                    "seller": null
+                },
+                });
             });
         </script>
     </body>

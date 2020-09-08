@@ -2,20 +2,19 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from flask_login import current_user
 from wtforms import StringField, PasswordField, SubmitField, \
-    BooleanField, TextAreaField, RadioField, IntegerField
+    BooleanField, TextAreaField, RadioField, IntegerField, SelectField
 from wtforms.validators import DataRequired, Length, Email, \
     ValidationError, EqualTo
 from main.models import User
 
 class LoginForm(FlaskForm):
     email = StringField('E-Mail', validators=[DataRequired(), Email()])
-    role = RadioField('Role', choices = [('customer', 'Customer'), ('seller', 'Seller')], validators=[DataRequired()])
+    role = StringField('Role', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
-    remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
 
 class RegistrationForm(FlaskForm):
-    role = RadioField('Role', choices = [('customer', 'Customer'), ('seller', 'Seller')], validators=[DataRequired()])
+    role = StringField('Role', validators=[DataRequired()])
     username = StringField('Username', validators=[DataRequired(),
                            Length(min=4, max=15)])
     email = StringField('E-Mail', validators=[DataRequired(), Email()])

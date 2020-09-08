@@ -20,7 +20,7 @@ def login():
         if user and bcrypt.check_password_hash(user.password,
                 form.password.data) and user.role == form.role.data:
             session['role'] = form.role.data
-            login_user(user, remember=form.remember.data)
+            login_user(user)
             next_page = request.args.get('next')
             if next_page:
                 return redirect(next_page)
