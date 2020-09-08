@@ -64,6 +64,28 @@ def search():
             products = products.filter(Product.name.like('%' + query + '%'))
             products = products.order_by(Product.name).all()
             return render_template('search.html', products=products)
+        else:
+            return redirect(url_for('customer_home'))
+    else:
+        return redirect(url_for('seller_dashboard'))
+
+@app.route('/products')
+@login_required
+def products():
+    if session['role'] == 'customer':
+        products = Product.query.all()
+        form = AddToCart()
+        return render_template('products.html', products = products, form = form)
+    else:
+        return redirect(url_for('seller_dashboard'))
+
+@app.route('/product/<int:id>')
+@login_required
+def show_product(id):
+    if session['role'] == 'customer':
+        product = Product.query.filter_by(id=id).first()
+        form = AddToCart()
+        return render_template('show_product.html', product = product, form = form)
     else:
         return redirect(url_for('seller_dashboard'))
 

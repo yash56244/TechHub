@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block content %}
+{% for product in products %}
+    <p>{{ product.name }}</p>
+    <p>{{ product.description }}</p>
+    <p>{{ product.price }}</p>
+    <img src="../static/product_pics/{{ product.photo_name }}" alt="">
+    {% if product.quantity %}
+        <form action="{{ url_for('add_to_cart', id = product.id) }}" method="POST">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.quantity.label(class="form-control-label") }}
+                {{ form.quantity(class="form-control form-control-md") }}
+            </div>
+            <div class="form-group">
+                {{ form.addToCart(class="btn btn-outline-dark") }}
+            </div>
+        </form>
+    {% else %}
+        <div class="form-group">
+            <button class="btn btn-danger" disabled="disabled">Sold Out</button>
+        </div>
+    {% endif %}
+{% endfor %}
+{% endblock content %}
