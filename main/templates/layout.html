@@ -14,14 +14,23 @@
     </head>
     <body>
         <nav>
-            <div class="nav-wrapper cyan accent-2" id="nav">
+            <div class="nav-wrapper light-blue accent-3" id="nav">
                 <div class="container">
                     <a href="{{ url_for('home') }}" class="brand-logo">Tech HUB</a>
                     <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
                     <ul class="right hide-on-med-and-down">
                         {% if current_user.is_authenticated %}
                             {% if session['role'] == 'customer' %}
-                                <li><a href="{{ url_for('customer_dashboard') }}">Products</a></li>
+                                <li>
+                                    <form action="{{ url_for('search') }}" method="POST">
+                                        <div class="input-field">
+                                          <input id="search" type="search" name="search" required>
+                                          <label class="label-icon" for="search"><i class="material-icons">search</i></label>
+                                          <i class="material-icons">close</i>
+                                        </div>
+                                    </form>
+                                </li>
+                                <li><a href="{{ url_for('customer_home') }}">Products</a></li>
                                 <li><a href="{{ url_for('orders') }}">My Orders</a></li>   
                                 <li><a href="{{ url_for('cart') }}">Cart</a></li>
                                 <li><a href="{{ url_for('logout') }}">Logout</a></li>
@@ -42,7 +51,16 @@
           <ul class="sidenav" id="mobile-demo">
             {% if current_user.is_authenticated %}
                 {% if session['role'] == 'customer' %}
-                    <li><a href="{{ url_for('customer_dashboard') }}">Products</a></li>
+                    <li>
+                        <form action="{{ url_for('search') }}" method="POST">
+                            <div class="input-field">
+                              <input id="search" type="search" name="search" required>
+                              <label class="label-icon" for="search"><i class="material-icons">search</i></label>
+                              <i class="material-icons">close</i>
+                            </div>
+                        </form>
+                    </li>
+                    <li><a href="{{ url_for('customer_home') }}">Products</a></li>
                     <li><a href="{{ url_for('orders') }}">My Orders</a></li>   
                     <li><a href="{{ url_for('cart') }}">Cart</a></li>
                     <li><a href="{{ url_for('logout') }}">Logout</a></li>

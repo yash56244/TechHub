@@ -63,6 +63,10 @@ class AddToCart(FlaskForm):
     quantity = IntegerField('Quantity', validators=[DataRequired()])
     addToCart = SubmitField('Add To Cart')
 
+    def validate_quantity(self, quantity):
+        if quantity.data is not int:
+            raise ValidationError('Enter Valid Quantity')
+
 class AddressForm(FlaskForm):
     addressLine1 = TextAreaField('Address Line 1', validators=[DataRequired()])
     addressLine2 = TextAreaField('Address Line 2', validators=[DataRequired()])

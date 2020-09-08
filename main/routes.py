@@ -8,7 +8,7 @@ from main.forms import LoginForm, RegistrationForm, ProductForm, AddToCart, Addr
 from main.models import User, Product, Cart, Order, Address, Sellerorder
 from werkzeug.utils import secure_filename
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def home():
     return render_template('home.html')
 
@@ -26,7 +26,7 @@ def login():
                 return redirect(next_page)
             else:
                 if form.role.data == 'customer':
-                    return redirect(url_for('customer_dashboard'))
+                    return redirect(url_for('customer_home'))
                 else:
                     return redirect(url_for('seller_dashboard'))
         else:
@@ -38,8 +38,7 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_pwd = \
-            bcrypt.generate_password_hash(form.password.data).decode('utf-8'
-                )
+            bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         user = User(username=form.username.data, email=form.email.data,
                     password=hashed_pwd, role = form.role.data)
         db.session.add(user)
@@ -55,42 +54,36 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-@app.route('/dashboard/customer')
+@app.route('/search', methods=['GET', 'POST'])
 @login_required
-def customer_dashboard():
+def search():
     if session['role'] == 'customer':
-        products = Product.query.all()
-        form = AddToCart()
-        return render_template('customer_dashboard.html', products = products, form = form)
+        if request.method == 'POST':
+            query = request.form.get('search')
+            products = Product.query
+            products = products.filter(Product.name.like('%' + query + '%'))
+            products = products.order_by(Product.name).all()
+            return render_template('search.html', products=products)
     else:
         return redirect(url_for('seller_dashboard'))
 
-@app.route('/cart/add/<int:id>', methods = ['GET', 'POST'])
+@app.route('/customer/home')
 @login_required
-def add_to_cart(id):
-    product = Product.query.filter_by(id=id).first()
-    form = AddToCart()
-    if form.validate_on_submit():
-        if form.quantity.data < product.quantity:
-            cart = Cart.query.filter_by(user_id=current_user.id).all()
-            alreadyPresent=False
-            for c in cart:
-                if product.id == c.product.id:
-                    c.quantity += form.quantity
-                    db.session.commit()
-                    alreadyPresent=True
-                    break
-            if not alreadyPresent:
-                cart1 = Cart(product = product, user_id=current_user.id, quantity=form.quantity.data)
-                db.session.add(cart1)
-                db.session.commit()
-            flash('Product successfully added to Cart', 'check')
-            return redirect(url_for('cart'))
-        else:
-            flash('Currently {} pieces of this item are available'.format(product.quantity), 'error_outline')
-            return redirect(url_for('customer_dashboard'))
+def customer_home():
+    if session['role'] == 'customer':
+        products = Product.query.all()
+        form = AddToCart()
+        return render_template('customer_home.html', products = products, form = form)
+    else:
+        return redirect(url_for('seller_dashboard'))
 
-@app.route('/cart')
+@app.route('/customer/orders')
+@login_required
+def orders():
+    orders = Order.query.filter_by(user_id=current_user.id).all()
+    return render_template('orders.html', orders=orders)
+
+@app.route('/customer/cart')
 @login_required
 def cart():
     if session['role'] == 'customer':
@@ -103,7 +96,32 @@ def cart():
         flash('Only customer can access this page', 'warning')
         return redirect(url_for('seller_dashboard'))
 
-@app.route('/cart/edit/<int:id>/<string:operation>')
+@app.route('/customer/cart/add/<int:id>', methods = ['GET', 'POST'])
+@login_required
+def add_to_cart(id):
+    product = Product.query.filter_by(id=id).first()
+    form = AddToCart()
+    if form.validate_on_submit:
+        if form.quantity.data < product.quantity:
+            cart = Cart.query.filter_by(user_id=current_user.id).all()
+            alreadyPresent=False
+            for c in cart:
+                if product.id == c.product.id:
+                    c.quantity += form.quantity.data
+                    db.session.commit()
+                    alreadyPresent=True
+                    break
+            if not alreadyPresent:
+                cart1 = Cart(product = product, user_id=current_user.id, quantity=form.quantity.data)
+                db.session.add(cart1)
+                db.session.commit()
+            flash('Product successfully added to Cart', 'check')
+            return redirect(url_for('cart'))
+        else:
+            flash('Currently {} pieces of this item are available'.format(product.quantity), 'error_outline')
+            return redirect(url_for('customer_home'))
+
+@app.route('/customer/cart/<string:operation>/<int:id>')
 @login_required
 def edit_cart(id, operation):
     cart = Cart.query.filter_by(id=id).first()
@@ -138,7 +156,7 @@ def seller_dashboard():
         products = Product.query.filter_by(seller=current_user).all()
         return render_template('seller_dashboard.html', products=products)
     else:
-        return redirect(url_for('customer_dashboard'))
+        return redirect(url_for('customer_home'))
 
 @app.route('/dashboard/seller/history')
 @login_required
@@ -151,7 +169,7 @@ def seller_history():
         customers.append(customer)
     return render_template('seller_history.html',context = zip(seller_orders, customers))
 
-@app.route('/dashboard/seller/new', methods=['POST', 'GET'])
+@app.route('/dashboard/seller/new_product', methods=['POST', 'GET'])
 @login_required
 def new_product():
     form = ProductForm()
@@ -182,7 +200,7 @@ def save_picture(form_picture):
 
         return picture_fn
 
-@app.route('/product/<int:id>/update', methods=['GET', 'POST'])
+@app.route('/seller/product/<int:id>/update', methods=['GET', 'POST'])
 @login_required
 def update_product(id):
     product = Product.query.get_or_404(id)
@@ -207,7 +225,7 @@ def update_product(id):
         form.quantity.data = product.quantity
     return render_template('new_product.html', legend='Update Product', form=form)
 
-@app.route('/order/checkout', methods=['GET', 'POST'])
+@app.route('/customer/checkout', methods=['GET', 'POST'])
 @login_required
 def checkout():
     form = AddressForm()
@@ -251,9 +269,3 @@ def checkout():
         form.state.data = address.state
         form.mobile.data = address.mobile
     return render_template('checkout.html', form=form, total=total, cart_items=cart)
-
-@app.route('/orders')
-@login_required
-def orders():
-    orders = Order.query.filter_by(user_id=current_user.id).all()
-    return render_template('orders.html', orders=orders)
