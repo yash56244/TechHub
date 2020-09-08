@@ -1,76 +1,81 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-        <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <link rel="shortcut icon" href="../static/img/favicon.png" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+        <link rel="stylesheet" href="../static/css/toasts.css">
         {% if title %}
         <title>{{ title }}</title>
         {% else %}
         <title>Tech HUB</title>
         {% endif %}
     </head>
-    <style>
-        ::-webkit-scrollbar {
-        width: 15px;
-        }
-        ::-webkit-scrollbar-track {
-        box-shadow: inset 0 0 5px grey; 
-        border-radius: 15px;
-        background-color: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-        background: #833AB4; 
-        border-radius: 15px;
-        }
-    </style>
     <body>
-        <header class="header">
-            <nav class="navbar navbar-expand-lg navbar-light">
+        <nav>
+            <div class="nav-wrapper cyan">
                 <div class="container">
-                    <a href="{{ url_for('home') }}" class="navbar-brand mr-4" style="font-size: xx-large; text-transform: uppercase; font-weight: bold; cursor: default;">Tech HUB</a>
-                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="navbarToggle">
-                        <div class="navbar-nav mr-auto">
-                            <a class="nav-item nav-link" href="#" style="font-weight: bolder; font-size: large;">Dashboard</a>
-                            <a class="nav-item nav-link" href="#" style="font-weight: bolder; font-size: large;">Feeds</a>
-                            <a class="nav-item nav-link" href="#" style="font-weight: bolder; font-size: large;">Notifications</a>
-                        </div>
-                        <div class="navbar-nav">
-                            {% if current_user.is_authenticated %}
-                            <a class="nav-item nav-link" href="#" style="font-weight: bolder; font-size: large;">New Article</a>
-                            <a class="nav-item nav-link" href="#" style="font-weight: bolder; font-size: large;">Account</a>
-                            <a class="nav-item nav-link" href="{{ url_for('logout') }}" style="font-weight: bolder; font-size: large;">Logout</a>
+                    <a href="{{ url_for('home') }}" class="brand-logo">Tech HUB</a>
+                    <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+                    <ul class="right hide-on-med-and-down">
+                        {% if current_user.is_authenticated %}
+                            {% if session['role'] == 'customer' %}
+                                <li><a href="{{ url_for('customer_dashboard') }}">Products</a></li>
+                                <li><a href="{{ url_for('orders') }}">My Orders</a></li>   
+                                <li><a href="{{ url_for('cart') }}">Cart</a></li>
+                                <li><a href="{{ url_for('logout') }}">Logout</a></li>
                             {% else %}
-                            <a class="nav-item nav-link" href="{{ url_for('login') }}" style="font-weight: bolder; font-size: large;">Login</a>
-                            <a class="nav-item nav-link" href="{{ url_for('register') }}" style="font-weight: bolder; font-size: large;">Register</a>
+                                <li><a href="{{ url_for('seller_dashboard') }}">Dashboard</a></li>
+                                <li><a href="{{ url_for('seller_history') }}">History</a></li>
+                                <li><a href="{{ url_for('logout') }}">Logout</a></li>
                             {% endif %}
-                        </div>
-                    </div>
+                        {% else %}
+                            <li><a href="{{ url_for('login') }}">Login</a></li>
+                            <li><a href="{{ url_for('register') }}">Register</a></li>
+                        {% endif %}
+                    </ul>
                 </div>
-            </nav>
-        </header>
+            </div>
+        </nav>
+        
+          <ul class="sidenav" id="mobile-demo">
+            {% if current_user.is_authenticated %}
+                {% if session['role'] == 'customer' %}
+                    <li><a href="{{ url_for('customer_dashboard') }}">Products</a></li>
+                    <li><a href="{{ url_for('orders') }}">My Orders</a></li>   
+                    <li><a href="{{ url_for('cart') }}">Cart</a></li>
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('seller_dashboard') }}">Dashboard</a></li>
+                    <li><a href="{{ url_for('seller_history') }}">History</a></li>
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                {% endif %}
+            {% else %}
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+                <li><a href="{{ url_for('register') }}">Register</a></li>
+            {% endif %}
+          </ul>
         <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-8">
                     {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                     {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">
-                        {{ message }}
-                    </div>
+                        <div class="materialert {{category}}">
+                            <div class="material-icons">{{category}}</div>
+                            {{ message }}
+                        </div>
                     {% endfor %}
                     {% endif %}
                     {% endwith %}
                     {% block content %}
                     {% endblock %}
-                </div>
-            </div>
         </div>
         <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+        <script>
+            $(document).ready(function(){
+                $('.sidenav').sidenav();
+            });
+        </script>
     </body>
 </html>

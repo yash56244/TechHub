@@ -30,7 +30,7 @@ def login():
                 else:
                     return redirect(url_for('seller_dashboard'))
         else:
-            flash('Please check your credentials', 'danger')
+            flash('Please check your credentials', 'error_outline')
     return render_template('login.html', form=form, title='Login')
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -44,7 +44,7 @@ def register():
                     password=hashed_pwd, role = form.role.data)
         db.session.add(user)
         db.session.commit()
-        flash('Your account has been created!', 'success')
+        flash('Your account has been created!', 'check')
         return redirect(url_for('login'))
     return render_template('register.html', form=form, title='Register')
 
@@ -84,10 +84,10 @@ def add_to_cart(id):
                 cart1 = Cart(product = product, user_id=current_user.id, quantity=form.quantity.data)
                 db.session.add(cart1)
                 db.session.commit()
-            flash('Product successfully added to Cart', 'success')
+            flash('Product successfully added to Cart', 'check')
             return redirect(url_for('cart'))
         else:
-            flash('Currently {} pieces of this item are available'.format(product.quantity), 'danger')
+            flash('Currently {} pieces of this item are available'.format(product.quantity), 'error_outline')
             return redirect(url_for('customer_dashboard'))
 
 @app.route('/cart')
@@ -111,7 +111,7 @@ def edit_cart(id, operation):
         if cart.quantity < cart.product.quantity:
             cart.quantity += 1
             db.session.commit()
-            flash('{} quantity updated'.format(cart.product.name), 'success')
+            flash('{} quantity updated'.format(cart.product.name), 'check')
             return redirect(url_for('cart'))
         else:
             flash('Currently {} pieces of this item are available'.format(cart.product.quantity), 'warning')
@@ -120,7 +120,7 @@ def edit_cart(id, operation):
         if cart.quantity > 1:
             cart.quantity -= 1
             db.session.commit()
-            flash('{} quantity updated'.format(cart.product.name), 'success')
+            flash('{} quantity updated'.format(cart.product.name), 'check')
             return redirect(url_for('cart'))
         else:
             flash('Quantity cannot be less than one.', 'warning')
@@ -128,7 +128,7 @@ def edit_cart(id, operation):
     else:
         db.session.delete(cart)
         db.session.commit()
-        flash('Item removed successfully', 'success')
+        flash('Item removed successfully', 'check')
         return redirect(url_for('cart'))
 
 @app.route('/dashboard/seller')
@@ -164,7 +164,7 @@ def new_product():
                           seller = current_user)
         db.session.add(product)
         db.session.commit()
-        flash('Product has been added successfully!', 'success')
+        flash('Product has been added successfully!', 'check')
         return redirect(url_for('seller_dashboard'))
     return render_template('new_product.html', legend = "Add Product", form=form)
 
@@ -198,7 +198,7 @@ def update_product(id):
         os.remove(pathp)
         product.photo_name = save_picture(form.photo.data)
         db.session.commit()
-        flash('Product has been updated!', 'success')
+        flash('Product has been updated!', 'check')
         return redirect(url_for('seller_dashboard'))
     elif request.method == 'GET':
         form.name.data = product.name
@@ -240,7 +240,7 @@ def checkout():
         for item in cart:
             Cart.query.filter_by(id=item.id).delete()
             db.session.commit()
-        flash('Order Place successfully', 'success')
+        flash('Order Place successfully', 'check')
         return redirect(url_for('orders'))
     address = Address.query.filter_by(user_id=current_user.id).first()
     if request.method == 'GET' and address is not None:
