@@ -1,8 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
 {% if cart %}
-    <p><h4 class="center-align">Shopping Cart</h4></p>
-    <hr>
+    <p><h4 class="center-align" style="text-decoration: underline;">Shopping Cart!!</h4></p>
     <div class="row hide-on-small-only">
         <div class="col s12 m3 center-align">
             <h5>Product</h5>
@@ -18,15 +17,16 @@
         </div>
     </div>
     {% for item in cart %}
+        <hr>
         <div class="row">
             <div class="col s12 m3 center-align">
                 <img class="responsive-img" src="../static/product_pics/{{ item.product.photo_name }}" alt="">
             </div>
             <div class="col s12 m3 center-align">
-                {{ item.product.name }}
+                <h6>{{ item.product.name }}</h6>
             </div>
             <div class="col s12 m3 center-align">
-                ₹ {{ item.product.price }}
+                <h6>₹ {{ item.product.price }}</h6>
             </div>
             <div class="col s12 m3 center-align">
                 <a href="{{ url_for('edit_cart', id=item.id, operation='decrease') }}" class="waves-effect waves-light btn black">-</a> {{ item.quantity }} <a href="{{ url_for('edit_cart', id=item.id, operation='increase') }}" class="waves-effect waves-light btn black">+</a>
