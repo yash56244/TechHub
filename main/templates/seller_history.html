@@ -1,13 +1,45 @@
 {% extends "layout.html" %}
 {% block content %}
-{% for (order, customer) in context %}
-    <p>{{ order.id }}</p>
-    <p>{{ order.time }}</p>
-    <p>{{ customer.username }}</p>
-    <p>{{ customer.email }}</p>
-    <p>{{ order.product.name }}</p>
-    <p>{{ order.product.price }}</p>
-    <p>{{ order.quantity }}</p>
-    <p>{{ order.total }}</p>
-{% endfor %}
+<div class="row">
+    <div class="col s12 center-align">
+        <h3 style="text-decoration: underline;">Sold History</h3>
+    </div>
+</div>
+{% if context %}
+    <table class="highlight centered responsive-table" style="font-size: 1.3em;">
+        <thead>
+            <tr>
+                <th>Order id</th>
+                <th>Name</th>
+                <th>Customer</th>
+                <th>Quantity</th>
+                <th>Time</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for (order, customer) in context %}
+                <tr>
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.product.name }}</td>
+                    <td>
+                        {{ customer.username }}
+                        <br>
+                        {{ customer.email }}
+                    </td>
+                    <td>{{ order.product.quantity }}</td>
+                    <td>{{ order.time }}</td>
+                    <td></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <hr>
+{% else %}
+    <div class="row">
+        <div class="col s12">
+            <h3>You have no customers yet!</h3>
+        </div>
+    </div>
+{% endif %}
 {% endblock content %}
