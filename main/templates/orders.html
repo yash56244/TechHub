@@ -1,11 +1,66 @@
 {% extends "layout.html" %}
 {% block content %}
-{% for order in orders %}
-    <p>{{ order.id }}</p>
-    <p>{{ order.time }}</p>
-    <p>{{ order.product.name }}</p>
-    <p>{{ order.product.price }}</p>
-    <p>{{ order.quantity }}</p>
-    <p>{{ order.total }}</p>
-{% endfor %}
+{% if orders %}
+    <p><h4 class="center-align" style="text-decoration: underline;">Your Orders</h4></p>
+    <div class="row hide-on-small-only">
+        <div class="col s12 m2 center-align">
+            <h5>Order id</h5>
+        </div>
+        <div class="col s12 m2 center-align">
+            <h5>Name</h5>
+        </div>
+        <div class="col s12 m2 center-align">
+            <h5>Price</h5>
+        </div>
+        <div class="col s12 m2 center-align">
+            <h5>Quantity</h5>
+        </div>
+        <div class="col s12 m2 center-align">
+            <h5>Time</h5>
+        </div>
+        <div class="col s12 m2 center-align">
+            <h5>Total</h5>
+        </div>
+    </div>
+    {% for order in orders %}
+        <hr>
+        <div class="row">
+            <div class="col s12 m2 center-align">
+                <h6>{{ order.id }}</h6>
+            </div>
+            <div class="col s12 m2 center-align">
+                <h6>
+                    {% if order.product.id %}
+                        <a href="{{ url_for('show_product', id=order.product.id) }}">{{ order.product.name }}</a>
+                    {% endif %}
+                </h6>
+            </div>
+            <div class="col s12 m2 center-align">
+                <h6>₹ {{ order.product.price }}</h6>
+            </div>
+            <div class="col s12 m2 center-align">
+                <h6>{{ order.quantity }}</h6>
+            </div>
+            <div class="col s12 m2 center-align">
+                <h6>{{ order.time }}</h6>
+            </div>
+            <div class="col s12 m2 center-align">
+                <h6>
+                    {% if order.product.price %}
+                        ₹ {{ order.product.price*order.quantity }}
+                    {% endif %}
+                </h6>
+            </div>
+        </div>
+    {% endfor %}
+    <hr>
+{% else %}
+    <div class="row">
+        <div class="col s12">
+            <h3>You have not place order yet!!</h3>
+            <hr>
+            <a href="{{ url_for('products') }}" class="waves-effect waves-light btn black btn-large" ><i class="material-icons left">arrow_back</i>Keep Shopping</a>
+        </div>
+    </div>
+{% endif %}
 {% endblock content %}

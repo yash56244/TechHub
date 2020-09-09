@@ -74,18 +74,25 @@ def search():
 def products():
     if session['role'] == 'customer':
         products = Product.query.all()
-        form = AddToCart()
-        return render_template('products.html', products = products, form = form)
+        return render_template('products.html', products = products)
     else:
         return redirect(url_for('seller_dashboard'))
+
+@app.route('/products/seller/<int:id>')
+@login_required
+def seller_products(id):
+    products = Product.query.filter_by(seller_id=id).all()
+    seller = User.query.filter_by(id = id).first()
+    return render_template('products.html', products = products, name = seller.username)
 
 @app.route('/product/<int:id>')
 @login_required
 def show_product(id):
     if session['role'] == 'customer':
         product = Product.query.filter_by(id=id).first()
+        seller = User.query.filter_by(id = product.seller_id).first()
         form = AddToCart()
-        return render_template('show_product.html', product = product, form = form)
+        return render_template('show_product.html', product = product, form = form, seller = seller)
     else:
         return redirect(url_for('seller_dashboard'))
 
@@ -252,19 +259,21 @@ def update_product(id):
 def checkout():
     form = AddressForm()
     cart = Cart.query.filter_by(user_id=current_user.id).all()
+    address = Address.query.filter_by(user_id=current_user.id).first()
     total = 0
     for item in cart:
         total += item.product.price*item.quantity
     if form.validate_on_submit():
-        address = Address(addressLine1 = form.addressLine1.data,
-                          addressLine2 = form.addressLine2.data,
-                          pincode = form.pincode.data,
-                          city = form.city.data,
-                          state = form.state.data,
-                          mobile = form.mobile.data,
-                          customer = current_user)
-        db.session.add(address)
-        db.session.commit()
+        if address is None:
+            address = Address(addressLine1 = form.addressLine1.data,
+                            addressLine2 = form.addressLine2.data,
+                            pincode = form.pincode.data,
+                            city = form.city.data,
+                            state = form.state.data,
+                            mobile = form.mobile.data,
+                            customer = current_user)
+            db.session.add(address)
+            db.session.commit()
         for item in cart:
             order = Order(product = item.product, user_id = current_user.id, quantity=item.quantity, total = total)
             db.session.add(order)
@@ -280,9 +289,8 @@ def checkout():
         for item in cart:
             Cart.query.filter_by(id=item.id).delete()
             db.session.commit()
-        flash('Order Place successfully', 'check')
+        flash('Order Placed successfully', 'check')
         return redirect(url_for('orders'))
-    address = Address.query.filter_by(user_id=current_user.id).first()
     if request.method == 'GET' and address is not None:
         form.addressLine1.data = address.addressLine1
         form.addressLine2.data = address.addressLine2
