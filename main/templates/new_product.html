@@ -2,7 +2,7 @@
 {% block content %}
 <div class="row container">
     <div class="col s12 ">
-        <form method="POST" action="" class="col s12">
+        <form method="POST" action="" class="col s12" enctype="multipart/form-data">
             {{ form.hidden_tag() }}
                 <center>
                     <h2>Add Product</h2>
@@ -20,6 +20,23 @@
                     {{ form.name(class="materialize-textarea validate") }}
                     {% endif %}
                     {{ form.name.label }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12">
+                    {% if form.category.errors %}
+                    <i class="material-icons prefix">supervisor_account</i>
+                    {{ form.category(class="autocomplete2") }}
+                    <span class="helper-text" data-success="right">customer, seller</span>
+                    {% for error in form.category.errors %}
+                    <span class="helper-text red-text" data-error="{{error}}" data-success="right">{{error}}</span>
+                    {% endfor %}
+                    {% else %}
+                    <i class="material-icons prefix">supervisor_account</i>
+                    {{ form.category(class="autocomplete2") }}
+                    <span class="helper-text" data-success="right">mobile, laptop</span>
+                    {% endif %}
+                    {{ form.category.label }}
                     </div>
                 </div>
                 <div class="row">

@@ -2,31 +2,47 @@
 {% block content %}
 <div class="container" style="margin-top: 10px;">
     <div class="carousel carousel-slider center">
-        <div class="carousel-item red white-text" href="#one!">
-        <h2>First Panel</h2>
-        <p class="white-text">This is your first panel</p>
-        </div>
-        <div class="carousel-item amber white-text" href="#two!">
-        <h2>Second Panel</h2>
-        <p class="white-text">This is your second panel</p>
-        </div>
-        <div class="carousel-item green white-text" href="#three!">
-        <h2>Third Panel</h2>
-        <p class="white-text">This is your third panel</p>
-        </div>
+        <a href="{{ url_for('show_product', id=mobiles[0].id) }}">
+            <div class="carousel-item white-text" style="background-image: url({{url_for('static', filename='/product_pics/' + mobiles[0].photo_name)}});background-repeat:no-repeat; background-size:cover;">
+                <h2>{{mobiles[0].name}}</h2>
+                <p>The new Beast is here</p>
+            </div>
+        </a>
+        <a href="{{ url_for('show_product', id=laptops[0].id) }}">
+            <div class="carousel-item blue-text" style="background-image: url({{url_for('static', filename='/product_pics/' + laptops[0].photo_name)}});background-repeat:no-repeat; background-size:cover;">
+                <h2>{{laptops[0].name}}</h2>
+                <p>The new Beast is here</p>
+            </div>
+        </a>
+        <a href="{{ url_for('show_product', id=laptops[0].id) }}">
+            <div class="carousel-item black-text" style="background-image: url({{url_for('static', filename='/product_pics/' + laptops[0].photo_name)}});background-repeat:no-repeat;">
+                <h1>{{laptops[0].name[:25]}}</h1>
+                <p>The new Beast is here</p>
+            </div>
+        </a>
     </div>
 </div>
 <div class="row">
     <div class="col s12">
         <h4>Latest deals on Mobiles!!</h4>
     </div>
-    {% for product in products %}
+    {% for product in mobiles %}
         <a href="{{ url_for('show_product', id=product.id) }}">
             <div class="col s12 m6 l3 hoverable black-text">
-                <img class="responsive-img" src="../static/product_pics/{{ product.photo_name }}" alt="">
-                <p>{{ product.name }}</p>
+                <img class="responsive-img" src="{{ url_for('static', filename='/product_pics/' + product.photo_name) }}" alt="">
+                <p>
+                    {{ product.name[0:30] }}
+                    {% if product.name|length > 30 %}
+                    ...
+                    {% endif %}
+                </p>
                 <p>₹ {{ product.price }}</p>
-                <p>{{ product.description }}</p>
+                <p>
+                    {{ product.description[0:40] }}
+                    {% if product.description|length > 40 %}
+                    ...
+                    {% endif %}
+                </p>
             </div>
         </a>
     {% endfor %}
@@ -39,13 +55,23 @@
     <div class="col s12">
         <h4>Latest deals on Laptops!!</h4>
     </div>
-    {% for product in products %}
+    {% for product in laptops %}
         <a href="{{ url_for('show_product', id=product.id) }}">
             <div class="col s12 m6 l3 hoverable black-text">
-                <img class="responsive-img" src="../static/product_pics/{{ product.photo_name }}" alt="">
-                <p>{{ product.name }}</p>
+                <img class="responsive-img" src="{{ url_for('static', filename='/product_pics/' + product.photo_name) }}" alt="">
+                <p>
+                    {{ product.name[0:30] }}
+                    {% if product.name|length > 30 %}
+                    ...
+                    {% endif %}
+                </p>
                 <p>₹ {{ product.price }}</p>
-                <p>{{ product.description }}</p>
+                <p>
+                    {{ product.description[0:40] }}
+                    {% if product.description|length > 40 %}
+                    ...
+                    {% endif %}
+                </p>
             </div>
         </a>
     {% endfor %}

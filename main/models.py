@@ -20,15 +20,15 @@ class User(db.Model, UserMixin):
 
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key = True)
-    name = db.Column(db.Text(20), nullable=False)
-    description = db.Column(db.Text(50), nullable=False)
+    name = db.Column(db.Text(50), nullable=False)
+    category = db.Column(db.Text(20), nullable=False)
+    description = db.Column(db.Text(150), nullable=False)
     price = db.Column(db.Integer, nullable=False)
     quantity = db.Column(db.Integer, nullable=True)
     photo_name = db.Column(db.Text, nullable=True)
     seller_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
     cart_id = db.Column(db.Integer, db.ForeignKey('cart.id'))
     order_id = db.Column(db.Integer, db.ForeignKey('order.id'))
-    seller_order_id = db.Column(db.Integer, db.ForeignKey('sellerorder.id'))
 
     def __repr__(self):
         return f"Product('{self.name}','{self.seller_id}', '{self.quantity}')"
@@ -43,25 +43,18 @@ class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     time = db.Column(db.DateTime, nullable = False, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    product = db.relationship('Product', backref='producto', uselist=False)
-    quantity = db.Column(db.Integer, nullable=False)
-    total = db.Column(db.Integer, nullable=False)
-
-class Sellerorder(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
     seller_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    product = db.relationship('Product', backref='productso', uselist=False)
+    product = db.relationship('Product', backref='producto', uselist=False)
     quantity = db.Column(db.Integer, nullable=False)
     total = db.Column(db.Integer, nullable=False)
 
 class Address(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    addressLine1 = db.Column(db.Text(50), nullable=False)
-    addressLine2 = db.Column(db.Text(50), nullable=False)
+    addressLine1 = db.Column(db.Text(100), nullable=False)
+    addressLine2 = db.Column(db.Text(100), nullable=False)
     pincode = db.Column(db.Integer, nullable = False)
-    city = db.Column(db.String(15), nullable = False)
+    city = db.Column(db.String(20), nullable = False)
     state = db.Column(db.String(20), nullable = False)
     mobile = db.Column(db.Integer, nullable = False)
 

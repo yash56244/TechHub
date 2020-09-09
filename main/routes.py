@@ -5,7 +5,7 @@ from main import app, db, bcrypt
 from flask import redirect, render_template, url_for, flash, request, session, abort
 from flask_login import login_user, logout_user, current_user, login_required
 from main.forms import LoginForm, RegistrationForm, ProductForm, AddToCart, AddressForm
-from main.models import User, Product, Cart, Order, Address, Sellerorder
+from main.models import User, Product, Cart, Order, Address
 from werkzeug.utils import secure_filename
 
 @app.route('/', methods=['GET', 'POST'])
@@ -61,7 +61,7 @@ def search():
         if request.method == 'POST':
             query = request.form.get('search')
             products = Product.query
-            products = products.filter(Product.name.like('%' + query + '%'))
+            products = products.filter(Product.name.like('%' + query + '%') | Product.description.like('%' + query + '%') | Product.category.like('%' + query + '%'))
             products = products.order_by(Product.name).all()
             return render_template('search.html', products=products, query=query)
         else:
@@ -103,9 +103,10 @@ def show_product(id):
 @login_required
 def customer_home():
     if session['role'] == 'customer':
-        products = Product.query.all()
+        mobiles = Product.query.filter_by(category='mobile').all()
+        laptops = Product.query.filter_by(category='laptop').all()
         form = AddToCart()
-        return render_template('customer_home.html', products = products[:4], form = form)
+        return render_template('customer_home.html', mobiles = mobiles[:4], laptops=laptops[:4], form = form)
     else:
         return redirect(url_for('seller_dashboard'))
 
@@ -181,13 +182,55 @@ def edit_cart(id, operation):
         flash('Item removed successfully', 'check')
         return redirect(url_for('cart'))
 
+@app.route('/customer/checkout', methods=['GET', 'POST'])
+@login_required
+def checkout():
+    form = AddressForm()
+    cart = Cart.query.filter_by(user_id=current_user.id).all()
+    address = Address.query.filter_by(user_id=current_user.id).first()
+    total = 0
+    for item in cart:
+        total += item.product.price*item.quantity
+    if form.validate_on_submit():
+        if address is None:
+            address = Address(addressLine1 = form.addressLine1.data,
+                            addressLine2 = form.addressLine2.data,
+                            pincode = form.pincode.data,
+                            city = form.city.data,
+                            state = form.state.data,
+                            mobile = form.mobile.data,
+                            customer = current_user)
+            db.session.add(address)
+            db.session.commit()
+        for item in cart:
+            order = Order(product = item.product, user_id = current_user.id, seller_id=item.product.seller_id, quantity=item.quantity, total = total)
+            db.session.add(order)
+            db.session.commit()
+        for item in cart:
+            product = Product.query.filter_by(id=item.product.id).first()
+            product.quantity -= item.quantity
+            db.session.commit()
+        for item in cart:
+            Cart.query.filter_by(id=item.id).delete()
+            db.session.commit()
+        flash('Order Placed successfully', 'check')
+        return redirect(url_for('orders'))
+    if request.method == 'GET' and address is not None:
+        form.addressLine1.data = address.addressLine1
+        form.addressLine2.data = address.addressLine2
+        form.pincode.data = address.pincode
+        form.city.data = address.city
+        form.state.data = address.state
+        form.mobile.data = address.mobile
+    return render_template('checkout.html', form=form, total=total, cart_items=cart)
+
 @app.route('/dashboard/seller')
 @login_required
 def seller_dashboard():
     if session['role'] == 'seller':
         products = Product.query.filter_by(seller=current_user).all()
         no_of_products = Product.query.filter_by(seller=current_user).count()
-        no_of_orders = Sellerorder.query.filter_by(seller_id = current_user.id).count()
+        no_of_orders = Order.query.filter_by(seller_id = current_user.id).count()
         return render_template('seller_dashboard.html', products=products, no_of_products = no_of_products, no_of_orders=no_of_orders)
     else:
         return redirect(url_for('customer_home'))
@@ -195,7 +238,7 @@ def seller_dashboard():
 @app.route('/dashboard/seller/history')
 @login_required
 def seller_history():
-    seller_orders = Sellerorder.query.filter_by(seller_id = current_user.id).all()
+    seller_orders = Order.query.filter_by(seller_id = current_user.id).all()
     customers = []
     for seller_order in seller_orders:
         customer_id = seller_order.user_id
@@ -210,6 +253,7 @@ def new_product():
     if form.validate_on_submit():
         product = Product(name = form.name.data,
                           description = form.description.data,
+                          category = form.category.data,
                           price = form.price.data, 
                           quantity = form.quantity.data,
                           photo_name = save_picture(form.photo.data),
@@ -244,9 +288,12 @@ def update_product(id):
     if form.validate_on_submit():
         product.name = form.name.data
         product.description = form.description.data
+        product.category = form.category.data
         product.price = form.price.data
         product.quantity = form.quantity.data
-        if form.photo.data:
+        if product.photo_name is None:
+            product.photo_name = save_picture(form.photo.data)
+        elif form.photo.data:
             pathp = app.root_path + '\static\product_pics\{}'.format(product.photo_name)
             os.remove(pathp)
             product.photo_name = save_picture(form.photo.data)
@@ -255,53 +302,8 @@ def update_product(id):
         return redirect(url_for('seller_dashboard'))
     elif request.method == 'GET':
         form.name.data = product.name
+        form.category.data = product.category
         form.description.data = product.description
         form.price.data = product.price
         form.quantity.data = product.quantity
     return render_template('new_product.html', legend='Update Product', form=form)
-
-@app.route('/customer/checkout', methods=['GET', 'POST'])
-@login_required
-def checkout():
-    form = AddressForm()
-    cart = Cart.query.filter_by(user_id=current_user.id).all()
-    address = Address.query.filter_by(user_id=current_user.id).first()
-    total = 0
-    for item in cart:
-        total += item.product.price*item.quantity
-    if form.validate_on_submit():
-        if address is None:
-            address = Address(addressLine1 = form.addressLine1.data,
-                            addressLine2 = form.addressLine2.data,
-                            pincode = form.pincode.data,
-                            city = form.city.data,
-                            state = form.state.data,
-                            mobile = form.mobile.data,
-                            customer = current_user)
-            db.session.add(address)
-            db.session.commit()
-        for item in cart:
-            order = Order(product = item.product, user_id = current_user.id, quantity=item.quantity, total = total)
-            db.session.add(order)
-            db.session.commit()
-        for item in cart:
-            sellerOrder = Sellerorder(seller_id=item.product.seller_id, user_id = current_user.id, product = item.product, quantity=item.quantity, total = total)
-            db.session.add(sellerOrder)
-            db.session.commit()
-        for item in cart:
-            product = Product.query.filter_by(id=item.product.id).first()
-            product.quantity -= item.quantity
-            db.session.commit()
-        for item in cart:
-            Cart.query.filter_by(id=item.id).delete()
-            db.session.commit()
-        flash('Order Placed successfully', 'check')
-        return redirect(url_for('orders'))
-    if request.method == 'GET' and address is not None:
-        form.addressLine1.data = address.addressLine1
-        form.addressLine2.data = address.addressLine2
-        form.pincode.data = address.pincode
-        form.city.data = address.city
-        form.state.data = address.state
-        form.mobile.data = address.mobile
-    return render_template('checkout.html', form=form, total=total, cart_items=cart)

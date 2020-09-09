@@ -45,6 +45,7 @@ class RegistrationForm(FlaskForm):
 
 class ProductForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
+    category = StringField('Category', validators=[DataRequired()])
     description = TextAreaField('Description', validators=[DataRequired()])
     price = IntegerField('Price', validators=[DataRequired()])
     quantity = IntegerField('Quantity', validators=[DataRequired()])
@@ -58,6 +59,10 @@ class ProductForm(FlaskForm):
     def validate_quantity(self, quantity):
         if quantity.data < 0:
             raise ValidationError('Quantity must be greater than zero.')
+
+    def validate_category(self, category):
+        if not (category.data == 'mobile' or category.data == 'laptop'):
+            raise ValidationError('Category must be valid!!')
 
 class AddToCart(FlaskForm):
     quantity = IntegerField('Quantity', validators=[DataRequired()])
