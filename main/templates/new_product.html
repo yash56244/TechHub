@@ -1,77 +1,95 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="content-section container shadow">
-    <form action="" method="POST" name="form" enctype="multipart/form-data">
-        {{ form.hidden_tag() }}
-            <fieldset class="form-group">
+<div class="row container">
+    <div class="col s12 ">
+        <form method="POST" action="" class="col s12">
+            {{ form.hidden_tag() }}
                 <center>
-                    <legend style="font-size: 40px; font-family: cursive; font-weight: 400;">{{ legend }}</legend>
+                    <h2>Add Product</h2>
                 </center>
-                <div class="form-group">
-                    {{ form.name.label(class="form-control-label") }}
+                <div class="row">
+                    <div class="input-field col s12">
                     {% if form.name.errors %}
-                    {{ form.name(class="form-control form-control-md is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.name.errors %}
-                        <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
+                    <i class="material-icons prefix">filter_list</i>
+                    {{ form.name(class="materialize-textarea validate") }}
+                    {% for error in form.name.errors %}
+                    <span class="helper-text red-text" data-error="{{error}}" data-success="right">{{error}}</span>
+                    {% endfor %}
                     {% else %}
-                    {{ form.name(class="form-control form-control-md") }}
+                    <i class="material-icons prefix">filter_list</i>
+                    {{ form.name(class="materialize-textarea validate") }}
                     {% endif %}
+                    {{ form.name.label }}
+                    </div>
                 </div>
-                <div class="form-group">
-                    {{ form.description.label(class="form-control-label") }}
+                <div class="row">
+                    <div class="input-field col s12">
                     {% if form.description.errors %}
-                    {{ form.description(class="form-control form-control-md is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.description.errors %}
-                        <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
+                    <i class="material-icons prefix">description</i>
+                    {{ form.description(class="materialize-textarea validate") }}
+                    {% for error in form.description.errors %}
+                    <span class="helper-text red-text" data-error="{{error}}" data-success="right">{{error}}</span>
+                    {% endfor %}
                     {% else %}
-                    {{ form.description(class="form-control form-control-md") }}
+                    <i class="material-icons prefix">description</i>
+                    {{ form.description(class="materialize-textarea validate") }}
                     {% endif %}
+                    {{ form.description.label }}
+                    </div>
                 </div>
-                <div class="form-group">
-                    {{ form.price.label(class="form-control-label") }}
+                <div class="row">
+                    <div class="input-field col s12">
                     {% if form.price.errors %}
-                    {{ form.price(class="form-control form-control-md is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.price.errors %}
-                        <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
+                    <i class="material-icons prefix">attach_money</i>
+                    {{ form.price(class="validate") }}
+                    {% for error in form.price.errors %}
+                    <span class="helper-text red-text" data-error="{{error}}" data-success="right">{{error}}</span>
+                    {% endfor %}
                     {% else %}
-                    {{ form.price(class="form-control form-control-md") }}
+                    <i class="material-icons prefix">attach_money</i>
+                    {{ form.price(class="validate") }}
                     {% endif %}
+                    {{ form.price.label }}
+                    </div>
                 </div>
-                <div class="form-group">
-                    {{ form.quantity.label(class="form-control-label") }}
+                <div class="row">
+                    <div class="input-field col s12">
                     {% if form.quantity.errors %}
-                    {{ form.quantity(class="form-control form-control-md is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.quantity.errors %}
-                        <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
+                    <i class="material-icons prefix">label</i>
+                    {{ form.quantity(class="validate") }}
+                    {% for error in form.quantity.errors %}
+                    <span class="helper-text red-text" data-error="{{error}}" data-success="right">{{error}}</span>
+                    {% endfor %}
                     {% else %}
-                    {{ form.quantity(class="form-control form-control-md") }}
+                    <i class="material-icons prefix">label</i>
+                    {{ form.quantity(class="validate") }}
                     {% endif %}
+                    {{ form.quantity.label }}
+                    </div>
                 </div>
-                <div class="form-group">
-                    {{ form.photo.label() }}
-                    {{ form.photo(class="form-control-file") }}
-                    {% if form.photo.errors %}
+                <div class="row">
+                    <div class="file-field input-field">
+                        {% if form.photo.errors %}
+                        {{ form.photo(class="validate") }}
                         {% for error in form.photo.errors %}
-                            <span class="text-danger">{{ error }}</span></br>
+                        <span class="helper-text red-text" data-error="{{error}}" data-success="right">{{error}}</span>
                         {% endfor %}
-                    {% endif %}
+                        {% else %}
+                        <div class="btn">
+                          <span>Photo</span>
+                          {{ form.photo }}
+                        </div>
+                        <div class="file-path-wrapper">
+                          <input class="file-path validate" type="text">
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
-            </fieldset>
-            <div class="form-group">
-                {{ form.add_product(class="btn btn-outline-info") }}
-            </div>
-    </form>
+                <div class="row right-align">
+                    <hr>
+                    {{ form.add_product(class="btn waves-light black") }}
+                </div>
+        </form>
+    </div>
 </div>
 {% endblock content %}
