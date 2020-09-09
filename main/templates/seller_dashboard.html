@@ -1,12 +1,62 @@
 {% extends "layout.html" %}
 {% block content %}
-<a class="btn btn-primary" href="{{ url_for('new_product') }}">Add Product</a>
-{% for product in products %}
-    <p>{{ product.name }}</p>
-    <p>{{ product.description }}</p>
-    <p>{{ product.price }}</p>
-    <p>{{ product.quantity }}</p>
-    <img src="../static/product_pics/{{ product.photo_name }}" alt="">
-    <a href="{{ url_for('update_product', id = product.id) }}" class="btn btn-secondary">Edit</a>
-{% endfor %}
+<div class="row">
+    <div class="col s12">
+        <h3>Dashboard</h3>
+        <hr>
+    </div>
+</div>
+<div class="row">
+    <div class="col s12 m6">
+        <div class="card-panel blue white-text">
+            <div class="row">
+                <div class="col s6 m6">
+                    <i class="material-icons " style="font-size: 9em;">format_list_bulleted</i>
+                </div>
+                <div class="col s6 m6 right-align">
+                    <p><h3>{{ no_of_products }}</h3></p>
+                    <p><h5>All Products</h5></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col s12 m6">
+        <div class="card-panel deep-orange darken-1 white-text">
+            <div class="row">
+                <div class="col s6 m6">
+                    <i class="material-icons " style="font-size: 9em;">shopping_cart</i>
+                </div>
+                <div class="col s6 m6 right-align">
+                    <p><h3>{{ no_of_orders }}</h3></p>
+                    <p><h5>All Orders</h5></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row right-align">
+    <a class="waves-effect waves-light btn deep-purple darken-1" href="{{ url_for('new_product') }}">Add Product</a>
+</div>
+<table class="highlight centered responsive-table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in products %}
+            <tr>
+                <td>{{ product.name }}</td>
+                <td>{{ product.description }}</td>
+                <td>{{ product.price }}</td>
+                <td>{{ product.quantity }}</td>
+                <td><a href="{{ url_for('update_product', id = product.id) }}" class="waves-effect waves-light btn green"><i class="material-icons">edit</i></a></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock content %}

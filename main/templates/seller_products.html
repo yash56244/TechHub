@@ -2,7 +2,7 @@
 {% block content %}
 <div class="row">
     <div class="col s12">
-        <h4 class="center-align">All Products</h4>
+        <h4 class="center-align">Products sold by {{name}}</h4>
     </div>
     {% for product in products %}
         <a href="{{ url_for('show_product', id=product.id) }}">
