@@ -2,7 +2,7 @@
 {% block content %}
     <div class="row" style="padding-top: 20px;">
         <div class="col s12 m6 l6 center-align">
-            <img src="../static/product_pics/{{ product.photo_name }}" alt="">
+            <img class="responsive-img" src="../static/product_pics/{{ product.photo_name }}" alt="">
         </div>
         <div class="col s12 m6 l6">
             <p><h3>{{ product.name }}</h3></p>
@@ -19,16 +19,16 @@
                     </div>
                     <div class="row">
                         <div class="col s6">
-                            <a href="{{ url_for('products') }}" class="waves-effect waves-light btn" ><i class="material-icons left">arrow_back</i>Back</a>
+                            <a href="{{ url_for('products') }}" class="waves-effect waves-light btn black" ><i class="material-icons left">arrow_back</i>Back</a>
                         </div>
                         <div class="col s6">
-                            {{ form.addToCart(class="btn") }}
+                            {{ form.addToCart(class="btn black") }}
                         </div>
                     </div>
                 </form>
             {% else %}
                 <div class="form-group">
-                    <button class="btn btn-danger" disabled="disabled">Sold Out</button>
+                    <button class="waves-effect waves-light btn red" disabled="disabled">Sold Out</button>
                 </div>
             {% endif %}
         </div>

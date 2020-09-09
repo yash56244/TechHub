@@ -63,7 +63,7 @@ def search():
             products = Product.query
             products = products.filter(Product.name.like('%' + query + '%'))
             products = products.order_by(Product.name).all()
-            return render_template('search.html', products=products)
+            return render_template('search.html', products=products, query=query)
         else:
             return redirect(url_for('customer_home'))
     else:

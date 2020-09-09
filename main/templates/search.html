@@ -1,6 +1,18 @@
 {% extends "layout.html" %}
 {% block content %}
-{% for product in products %}
-<p>{{ product.name }}</p>
-{% endfor %}
+<div class="row">
+    <div class="col s12">
+        <h4 class="center-align">Search results for "{{ query }}"</h4>
+    </div>
+    {% for product in products %}
+        <a href="{{ url_for('show_product', id=product.id) }}">
+            <div class="col s12 m6 l3 hoverable black-text">
+                <img class="responsive-img" src="../static/product_pics/{{ product.photo_name }}" alt="">
+                <p>{{ product.name }}</p>
+                <p>₹ {{ product.price }}</p>
+                <p>{{ product.description }}</p>
+            </div>
+        </a>
+    {% endfor %}
+</div>
 {% endblock content %}

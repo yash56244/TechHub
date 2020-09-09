@@ -1,12 +1,51 @@
 {% extends "layout.html" %}
 {% block content %}
-{% for item in cart %}
-<p>{{ item.product.name }}</p>
-<p>{{ item.product.price }}</p>
-<p> <a href="{{ url_for('edit_cart', id=item.id, operation='decrease') }}">-</a> {{ item.quantity }} <a href="{{ url_for('edit_cart', id=item.id, operation='increase') }}">+</a></p>
-<img src="../static/product_pics/{{ item.product.photo_name }}" alt="">
-<a href="{{ url_for('edit_cart', id=item.id, operation='remove') }}">Remove</a>
-{% endfor %}
-<p>Total - {{ total }}</p>
-<a href="{{ url_for('checkout') }}">Check Out!</a>
+{% if cart %}
+    <p><h4 class="center-align">Shopping Cart</h4></p>
+    <hr>
+    <div class="row hide-on-small-only">
+        <div class="col s12 m3 center-align">
+            <h5>Product</h5>
+        </div>
+        <div class="col s12 m3 center-align">
+            <h5>Name</h5>
+        </div>
+        <div class="col s12 m3 center-align">
+            <h5>Price</h5>
+        </div>
+        <div class="col s12 m3 center-align">
+            <h5>Quantity</h5>
+        </div>
+    </div>
+    {% for item in cart %}
+        <div class="row">
+            <div class="col s12 m3 center-align">
+                <img class="responsive-img" src="../static/product_pics/{{ item.product.photo_name }}" alt="">
+            </div>
+            <div class="col s12 m3 center-align">
+                {{ item.product.name }}
+            </div>
+            <div class="col s12 m3 center-align">
+                ₹ {{ item.product.price }}
+            </div>
+            <div class="col s12 m3 center-align">
+                <a href="{{ url_for('edit_cart', id=item.id, operation='decrease') }}" class="waves-effect waves-light btn black">-</a> {{ item.quantity }} <a href="{{ url_for('edit_cart', id=item.id, operation='increase') }}" class="waves-effect waves-light btn black">+</a>
+                <p><a href="{{ url_for('edit_cart', id=item.id, operation='remove') }}" class="waves-effect waves-light btn red" >Remove</a></p>
+            </div>
+        </div>
+    {% endfor %}
+    <hr>
+    <div class="row right-align">
+        <p><h4>Total : ₹ {{ total }}</h4></p>
+        <a href="{{ url_for('checkout') }}" class="waves-effect waves-light btn black btn-large">Check Out!<i class="material-icons right">arrow_forward</i></a>
+    </div>
+{% else %}
+    <div class="row">
+        <div class="col s12">
+            <h3>Your Shopping cart is Empty!!</h3>
+            <hr>
+            <a href="{{ url_for('products') }}" class="waves-effect waves-light btn black btn-large" ><i class="material-icons left">arrow_back</i>Keep Shopping</a>
+        </div>
+    </div>
+{% endif %}
 {% endblock content %}
