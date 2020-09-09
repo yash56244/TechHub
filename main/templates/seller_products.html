@@ -7,7 +7,7 @@
     {% for product in products %}
         <a href="{{ url_for('show_product', id=product.id) }}">
             <div class="col s12 m6 l3 hoverable black-text">
-                <img class="responsive-img" src="../static/product_pics/{{ product.photo_name }}" alt="">
+                <img class="responsive-img" src="{{ url_for('static', filename='/product_pics/' + product.photo_name) }}" alt="">
                 <p>{{ product.name }}</p>
                 <p>₹ {{ product.price }}</p>
                 <p>{{ product.description }}</p>

@@ -246,9 +246,10 @@ def update_product(id):
         product.description = form.description.data
         product.price = form.price.data
         product.quantity = form.quantity.data
-        pathp = app.root_path + '\static\product_pics\{}'.format(product.photo_name)
-        os.remove(pathp)
-        product.photo_name = save_picture(form.photo.data)
+        if form.photo.data:
+            pathp = app.root_path + '\static\product_pics\{}'.format(product.photo_name)
+            os.remove(pathp)
+            product.photo_name = save_picture(form.photo.data)
         db.session.commit()
         flash('Product has been updated!', 'check')
         return redirect(url_for('seller_dashboard'))

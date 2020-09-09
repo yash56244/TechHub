@@ -5,7 +5,7 @@
         <link rel="shortcut icon" href="../static/img/favicon.png" type="image/x-icon">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-        <link rel="stylesheet" href="../static/css/toasts.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='/css/home.css') }}">
         {% if title %}
         <title>{{ title }}</title>
         {% else %}

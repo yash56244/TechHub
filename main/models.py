@@ -24,7 +24,7 @@ class Product(db.Model):
     description = db.Column(db.Text(50), nullable=False)
     price = db.Column(db.Integer, nullable=False)
     quantity = db.Column(db.Integer, nullable=True)
-    photo_name = db.Column(db.Text, nullable=False)
+    photo_name = db.Column(db.Text, nullable=True)
     seller_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
     cart_id = db.Column(db.Integer, db.ForeignKey('cart.id'))
     order_id = db.Column(db.Integer, db.ForeignKey('order.id'))
