@@ -21,14 +21,36 @@
         <h4>Latest deals on Mobiles!!</h4>
     </div>
     {% for product in products %}
-        <div class="col s12 m6 l3">
-            <img src="../static/product_pics/{{ product.photo_name }}" alt="">
-            <p><a href="{{ url_for('show_product', id=product.id) }}">{{ product.name }}</a></p>
-            <p>₹ {{ product.price }}</p>
-        </div>
+        <a href="{{ url_for('show_product', id=product.id) }}">
+            <div class="col s12 m6 l3 hoverable">
+                <img src="../static/product_pics/{{ product.photo_name }}" alt="">
+                <p>{{ product.name }}</p>
+                <p>₹ {{ product.price }}</p>
+                <p>{{ product.description }}</p>
+            </div>
+        </a>
     {% endfor %}
-    <div class="col s12 right-align">
-        <a href="{{ url_for('products') }}" class="waves-effect waves-light btn" >View ALL!</a>
+    <div class="col s12 right-align" style="padding-top: 10px;">
+        <a href="{{ url_for('products') }}" class="waves-effect waves-light btn purple" >View ALL!<i class="material-icons right">send</i></a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col s12">
+        <h4>Latest deals on Laptops!!</h4>
+    </div>
+    {% for product in products %}
+        <a href="{{ url_for('show_product', id=product.id) }}">
+            <div class="col s12 m6 l3 hoverable">
+                <img src="../static/product_pics/{{ product.photo_name }}" alt="">
+                <p>{{ product.name }}</p>
+                <p>₹ {{ product.price }}</p>
+                <p>{{ product.description }}</p>
+            </div>
+        </a>
+    {% endfor %}
+    <div class="col s12 right-align" style="padding-top: 10px;">
+        <a href="{{ url_for('products') }}" class="waves-effect waves-light btn purple" >View ALL!<i class="material-icons right">send</i></a>
     </div>
 </div>
 {% endblock content %}

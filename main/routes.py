@@ -95,7 +95,7 @@ def customer_home():
     if session['role'] == 'customer':
         products = Product.query.all()
         form = AddToCart()
-        return render_template('customer_home.html', products = products, form = form)
+        return render_template('customer_home.html', products = products[:4], form = form)
     else:
         return redirect(url_for('seller_dashboard'))
 

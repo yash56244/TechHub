@@ -1,23 +1,36 @@
 {% extends "layout.html" %}
 {% block content %}
-    <p>{{ product.name }}</p>
-    <p>{{ product.description }}</p>
-    <p>{{ product.price }}</p>
-    <img src="../static/product_pics/{{ product.photo_name }}" alt="">
-    {% if product.quantity %}
-        <form action="{{ url_for('add_to_cart', id = product.id) }}" method="POST">
-            {{ form.hidden_tag() }}
-            <div class="form-group">
-                {{ form.quantity.label(class="form-control-label") }}
-                {{ form.quantity(class="form-control form-control-md") }}
-            </div>
-            <div class="form-group">
-                {{ form.addToCart(class="btn btn-outline-dark") }}
-            </div>
-        </form>
-    {% else %}
-        <div class="form-group">
-            <button class="btn btn-danger" disabled="disabled">Sold Out</button>
+    <div class="row" style="padding-top: 20px;">
+        <div class="col s12 m6 l6 center-align">
+            <img src="../static/product_pics/{{ product.photo_name }}" alt="">
         </div>
-    {% endif %}
+        <div class="col s12 m6 l6">
+            <p><h3>{{ product.name }}</h3></p>
+            <p>{{ product.description }}</p>
+            <p><h5>₹ {{ product.price }}</h5></p>
+            {% if product.quantity %}
+                <form action="{{ url_for('add_to_cart', id = product.id) }}" method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="row">
+                        <div class="input-field col s6">
+                            {{ form.quantity.label(class="") }}
+                            {{ form.quantity(class="validate") }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s6">
+                            <a href="{{ url_for('products') }}" class="waves-effect waves-light btn" ><i class="material-icons left">arrow_back</i>Back</a>
+                        </div>
+                        <div class="col s6">
+                            {{ form.addToCart(class="btn") }}
+                        </div>
+                    </div>
+                </form>
+            {% else %}
+                <div class="form-group">
+                    <button class="btn btn-danger" disabled="disabled">Sold Out</button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
 {% endblock content %}
