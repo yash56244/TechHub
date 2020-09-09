@@ -81,9 +81,12 @@ def products():
 @app.route('/products/seller/<int:id>')
 @login_required
 def seller_products(id):
-    products = Product.query.filter_by(seller_id=id).all()
     seller = User.query.filter_by(id = id).first()
-    return render_template('products.html', products = products, name = seller.username)
+    if seller.role == 'seller':
+        products = Product.query.filter_by(seller_id=id).all()
+        return render_template('products.html', products = products, name = seller.username)
+    else:
+        return redirect(url_for('customer_home'))
 
 @app.route('/product/<int:id>')
 @login_required
