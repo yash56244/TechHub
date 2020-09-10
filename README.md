@@ -25,3 +25,27 @@
 	`python app.py`
 
 - Open [127.0.0.1:5000/](http://127.0.0.1:5000/) and you are set to go
+
+## Screenshots
+
+<img src="https://github.com/yash56244/Spider-Task-3/blob/master/Screenshots/Screenshot%20(1).png">
+
+<img src="https://github.com/yash56244/Spider-Task-3/blob/master/Screenshots/Screenshot%20(2).png">
+
+<img src="https://github.com/yash56244/Spider-Task-3/blob/master/Screenshots/Screenshot%20(3).png">
+
+<img src="https://github.com/yash56244/Spider-Task-3/blob/master/Screenshots/Screenshot%20(4).png">
+
+<img src="https://github.com/yash56244/Spider-Task-3/blob/master/Screenshots/Screenshot%20(5).png">
+
+<img src="https://github.com/yash56244/Spider-Task-3/blob/master/Screenshots/Screenshot%20(6).png">
+
+<img src="https://github.com/yash56244/Spider-Task-3/blob/master/Screenshots/Screenshot%20(7).png">
+
+<img src="https://github.com/yash56244/Spider-Task-3/blob/master/Screenshots/Screenshot%20(8).png">
+
+<img src="https://github.com/yash56244/Spider-Task-3/blob/master/Screenshots/Screenshot%20(9).png">
+
+<img src="https://github.com/yash56244/Spider-Task-3/blob/master/Screenshots/Screenshot%20(10).png">
+
+<img src="https://github.com/yash56244/Spider-Task-3/blob/master/Screenshots/Screenshot%20(11).png">
