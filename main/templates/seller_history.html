@@ -29,7 +29,7 @@
                     </td>
                     <td>{{ order.product.quantity }}</td>
                     <td>{{ order.time }}</td>
-                    <td></td>
+                    <td>₹ {{ order.product.price*order.quantity }}</td>
                 </tr>
             {% endfor %}
         </tbody>

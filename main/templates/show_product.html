@@ -6,8 +6,8 @@
         </div>
         <div class="col s12 m6 l6">
             <p><h3>{{ product.name }}</h3></p>
-            <p>{{ product.description }}</p>
             <p><h5>₹ {{ product.price }}</h5></p>
+            <p>{{ product.description }}</p>
             <p>Sold By :- <a href="{{ url_for('seller_products', id=seller.id) }}" class="waves-effect waves-light btn teal">{{ seller.username }}</a></p>
             {% if product.quantity %}
                 <form action="{{ url_for('add_to_cart', id = product.id) }}" method="POST">

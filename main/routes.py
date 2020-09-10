@@ -7,6 +7,8 @@ from flask_login import login_user, logout_user, current_user, login_required
 from main.forms import LoginForm, RegistrationForm, ProductForm, AddToCart, AddressForm
 from main.models import User, Product, Cart, Order, Address
 from werkzeug.utils import secure_filename
+from datetime import datetime
+import sqlalchemy as sa
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -63,7 +65,7 @@ def search():
             products = Product.query
             products = products.filter(Product.name.like('%' + query + '%') | Product.description.like('%' + query + '%') | Product.category.like('%' + query + '%'))
             products = products.order_by(Product.name).all()
-            return render_template('search.html', products=products, query=query)
+            return render_template('products.html', products=products, query=query)
         else:
             return redirect(url_for('customer_home'))
     else:
@@ -84,7 +86,7 @@ def seller_products(id):
     seller = User.query.filter_by(id = id).first()
     if seller.role == 'seller':
         products = Product.query.filter_by(seller_id=id).all()
-        return render_template('seller_products.html', products = products, name = seller.username)
+        return render_template('products.html', products = products, name = seller.username)
     else:
         return redirect(url_for('customer_home'))
 
@@ -231,7 +233,10 @@ def seller_dashboard():
         products = Product.query.filter_by(seller=current_user).all()
         no_of_products = Product.query.filter_by(seller=current_user).count()
         no_of_orders = Order.query.filter_by(seller_id = current_user.id).count()
-        return render_template('seller_dashboard.html', products=products, no_of_products = no_of_products, no_of_orders=no_of_orders)
+        graph=[]
+        prev = Order.query.group_by(sa.func.strftime('%d')).count()
+        graph.append(prev)
+        return render_template('seller_dashboard.html', products=products, no_of_products = no_of_products, no_of_orders=no_of_orders, graph=graph)
     else:
         return redirect(url_for('customer_home'))
 

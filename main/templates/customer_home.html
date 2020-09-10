@@ -3,21 +3,15 @@
 <div class="container" style="margin-top: 10px;">
     <div class="carousel carousel-slider center">
         <a href="{{ url_for('show_product', id=mobiles[0].id) }}">
-            <div class="carousel-item white-text" style="background-image: url({{url_for('static', filename='/product_pics/' + mobiles[0].photo_name)}});background-repeat:no-repeat; background-size:cover;">
+            <div class="carousel-item orange-text" style="background-image: url({{url_for('static', filename='/product_pics/' + mobiles[0].photo_name)}});background-repeat:no-repeat; background-size:cover;">
                 <h2>{{mobiles[0].name}}</h2>
                 <p>The new Beast is here</p>
             </div>
         </a>
         <a href="{{ url_for('show_product', id=laptops[0].id) }}">
-            <div class="carousel-item blue-text" style="background-image: url({{url_for('static', filename='/product_pics/' + laptops[0].photo_name)}});background-repeat:no-repeat; background-size:cover;">
+            <div class="carousel-item orange-text" style="background-image: url({{url_for('static', filename='/product_pics/' + laptops[0].photo_name)}});background-repeat:no-repeat; background-size:cover;">
                 <h2>{{laptops[0].name}}</h2>
-                <p>The new Beast is here</p>
-            </div>
-        </a>
-        <a href="{{ url_for('show_product', id=laptops[0].id) }}">
-            <div class="carousel-item black-text" style="background-image: url({{url_for('static', filename='/product_pics/' + laptops[0].photo_name)}});background-repeat:no-repeat;">
-                <h1>{{laptops[0].name[:25]}}</h1>
-                <p>The new Beast is here</p>
+                <p>The best gaming is here</p>
             </div>
         </a>
     </div>

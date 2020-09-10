@@ -41,7 +41,7 @@ class Cart(db.Model):
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    time = db.Column(db.DateTime, nullable = False, default=datetime.utcnow)
+    time = db.Column(db.DateTime, nullable = False, default=datetime.strftime(datetime.today(), "%b %d %Y"))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     seller_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     product = db.relationship('Product', backref='producto', uselist=False)

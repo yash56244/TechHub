@@ -69,4 +69,38 @@
         {% endfor %}
     </tbody>
 </table>
+<div class="row">
+    <div class="col s12 center-align">
+        <h4>Plot of no of Orders(y) vs Day(x)</h4>
+    </div>
+</div>
+<canvas id="canvas" style="width: 100%; margin: 20px 0px;"></canvas>
+<script>
+    var canvas = document.getElementById('canvas'),
+		context = canvas.getContext('2d'),
+		width = canvas.width = 800,
+		height = canvas.height = 400;
+    var graph = {{ graph }};
+    context.translate(0, height);
+    context.scale(1, -1);
+    context.fillStyle = '#f6f6f6';
+    context.fillRect(0, 0, width, height);
+    var left = 0, prev_point = 0, move_left_by = 100;
+    for(point in graph) {
+        the_stat = graph[point];
+        context.beginPath();
+        context.moveTo(left, prev_point);
+        context.lineTo(left+move_left_by, the_stat*50);
+        context.lineWidth = 5;
+        context.lineCap = 'round';
+        if(the_stat < graph[point-1]) {
+            context.strokeStyle = '#c0392b';
+        } else {
+            context.strokeStyle = '#3b3b3b';
+        }
+        context.stroke();
+        prev_point = the_stat*50;
+        left += move_left_by;
+    }
+</script>
 {% endblock content %}
