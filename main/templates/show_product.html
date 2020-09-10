@@ -10,7 +10,7 @@
             <p>{{ product.description }}</p>
             <p>Sold By :- <a href="{{ url_for('seller_products', id=seller.id) }}" class="waves-effect waves-light btn teal">{{ seller.username }}</a></p>
             {% if product.quantity %}
-                <form action="{{ url_for('add_to_cart', id = product.id) }}" method="POST">
+                <form action="" method="POST">
                     {{ form.hidden_tag() }}
                     <div class="row">
                         <div class="input-field col s6">
