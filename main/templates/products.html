@@ -15,7 +15,9 @@
     {% for product in products %}
         <a href="{{ url_for('show_product', id=product.id) }}">
             <div class="col s12 m6 l4 hoverable black-text center-align" style="height: 400px;">
+                {% if product.photo_name %}
                 <img class="responsive-img" src="{{ url_for('static', filename='/product_pics/' + product.photo_name) }}" alt="">
+                {% endif %}
                 <p>
                     {{ product.name[0:30] }}
                     {% if product.name|length > 30 %}
