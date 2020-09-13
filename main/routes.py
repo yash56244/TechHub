@@ -240,14 +240,15 @@ def seller_dashboard():
         no_of_products = Product.query.filter_by(seller=current_user).count()
         no_of_orders = Order.query.filter_by(seller_id = current_user.id).count()
         graph=[]
-        j = Order.query.filter_by(seller_id=current_user.id).first().time
-        j = int(j.strftime('%d'))
-        for i in range(7):
-            prev = Order.query.filter(Order.time > datetime(2020, 9, j), Order.time < datetime(2020, 9, j + 1)).count()
-            if prev == 0 and j == int(datetime.today().strftime('%d')) + 1:
-                break
-            j += 1
-            graph.append(prev)
+        if Order.query.filter_by(seller_id=current_user.id).first():
+            j = Order.query.filter_by(seller_id=current_user.id).first().time
+            j = int(j.strftime('%d'))
+            for i in range(7):
+                prev = Order.query.filter(Order.time > datetime(2020, 9, j), Order.time < datetime(2020, 9, j + 1)).count()
+                if prev == 0 and j == int(datetime.today().strftime('%d')) + 1:
+                    break
+                j += 1
+                graph.append(prev)
         return render_template('seller_dashboard.html', products=products, no_of_products = no_of_products, no_of_orders=no_of_orders, graph=graph)
     else:
         flash('Only Seller can access this page', 'warning')
